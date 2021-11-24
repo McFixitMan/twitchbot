@@ -5,7 +5,7 @@ export const botConfig = {
         clientSecret: process.env.CLIENT_SECRET ?? '',
     },
     broadcaster: {
-        username: process.env.CHAT_CHANNEL ?? 'mcfixit',
+        username: process.env.CHAT_CHANNEL ?? '',
     },
     database: {
         host: process.env.DATABASE_HOST ?? '',
