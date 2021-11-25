@@ -98,6 +98,14 @@ export class ApiManager {
 
         return totalMs * 1000;
     };
+
+    getSubs = async(): Promise<Array<string>> => {
+        const subs = await this.apiClient.subscriptions.getSubscriptions(this._broadcasterId);
+
+        return subs.data
+            .filter(sub => sub.userId !== this._broadcasterId)
+            .map(sub => sub.userDisplayName);
+    };
 }
 
 export const createApiManager = async (authProvider: AuthProvider, props?: ApiManagerProps): Promise<ApiManager> => {
