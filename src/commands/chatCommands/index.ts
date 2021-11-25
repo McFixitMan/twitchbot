@@ -3,6 +3,7 @@ import { ChatMessage } from '../../services/chat';
 import { CommandList } from '../base';
 import { DelayCommand } from './delayCommand';
 import { GameInfoCommand } from './gameInfoCommand';
+import { PermitCommand } from './permitCommand';
 import { StreamersCommand } from './streamersCommand';
 import { SubsCommand } from './subsCommand';
 import { TimerCommand } from './timerCommand';
@@ -12,6 +13,7 @@ const commandList: CommandList<ChatMessage> = [
     ChangeTitleCommand,
     DelayCommand,
     GameInfoCommand,
+    PermitCommand,
     StreamersCommand,
     SubsCommand,
     TimerCommand,

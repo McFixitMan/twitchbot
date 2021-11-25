@@ -86,6 +86,24 @@ export class TwitchBot {
                 const now = new Date();
                 console.log(`[${now.toLocaleTimeString()}] ${chatMessage.msg.userInfo.displayName}: ${chatMessage.message}`);
 
+                // Check if message contains a link
+                if (!!chatMessage.message.match(/^((?:https?:\/\/)?[^./]+(?:\.[^./]+)+(?:\/.*)?)$/)) {
+                    const { userInfo } = chatMessage.msg;
+
+                    // Never block broadcaster
+                    if (!userInfo.isBroadcaster) {
+                        if (!await this.chatManager.isUserPermitted(userInfo.userName)) {
+                            await this.chatManager.deleteMessage(chatMessage.msg.id);
+                            await this.chatManager.sendMessage(`What is this, Reddit? No links ${userInfo.displayName}!`);
+
+                            return;
+                        } else {
+                            // User was permitted, remove permit now that they've sent a link
+                            await this.chatManager.removePermit(userInfo.userName);
+                        }
+                    }
+                }
+
                 for (const cmd of this.chatCommands) {
                     try {
                         if (cmd.isCompatible(chatMessage)) {

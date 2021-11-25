@@ -25,6 +25,7 @@ export class ChatManager {
 
     private _channelName: string = botConfig.broadcaster.username;
     private _props: ChatManagerProps = {};
+    private _permits: Array<string> = [];
 
     constructor(authProvider: AuthProvider) {
         this.chatClient = new ChatClient({ 
@@ -56,8 +57,40 @@ export class ChatManager {
         await this.chatClient.timeout(this._channelName, username, timeoutSeconds, reason);
     };
 
+    deleteMessage = async (messageId: string): Promise<void> => {
+        this.chatClient.deleteMessage(this._channelName, messageId);
+    };
+
+
     runCommercial = async (commercialLength: 30 | 60 | 90 | 120 | 150 | 180): Promise<void> => {
         await this.chatClient.runCommercial(this._channelName, commercialLength);
+    };
+
+    permitLink = async (username: string): Promise<void> => {
+        this._permits.push(username);
+
+        setTimeout(() => {
+            const index = this._permits.findIndex(user => user === username);
+
+            if (index > -1) {
+                this._permits.splice(index, 1);
+            }
+
+        }, 60 * 1000);
+    };
+
+    removePermit = async (username: string): Promise<void> => {
+        const index = this._permits.findIndex(user => user === username);
+
+        if (index > -1) {
+            this._permits.splice(index, 1);
+        }
+    };
+
+    isUserPermitted = async (username: string): Promise<boolean> => {
+        const found = this._permits.find(user => user === username);
+
+        return !!found;
     };
 
     private configureListeners = async (): Promise<void> => {
