@@ -15,7 +15,7 @@ export class UptimeCommand extends CommandBase<ChatMessage> {
     execute = async (message: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
         
-        const seconds = await apiManager?.getUptimeInSeconds();
+        const seconds = await apiManager.getUptimeInSeconds();
 
         await chatManager.sendMessage(`Stream has been up for ${seconds} seconds`);
     };

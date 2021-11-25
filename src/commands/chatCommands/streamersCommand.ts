@@ -18,7 +18,7 @@ export class StreamersCommand extends CommandBase<ChatMessage> {
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
 
-        const streamersList = await apiManager?.getOtherStreamers();
+        const streamersList = await apiManager.getOtherStreamers();
         
         if (!!streamersList) {
             for (const streamer of streamersList) {

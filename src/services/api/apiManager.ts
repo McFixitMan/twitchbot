@@ -70,12 +70,12 @@ export class ApiManager {
     getOtherStreamers = async (): Promise<Array<string>> => {
         const channelInfo = await this.apiClient.channels.getChannelInfo(this._broadcasterId);
         if (!channelInfo) {
-            throw new Error('Error getting channel info');
+            throw new Error('Couldn\'t get channel info');
         }
 
         const gameInfo = await channelInfo.getGame();
         if (!gameInfo) {
-            throw new Error('Error getting game info');
+            throw new Error('Couldn\'t get game info');
         }
 
         const streams = await gameInfo.getStreams();

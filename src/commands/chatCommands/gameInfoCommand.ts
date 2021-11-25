@@ -15,7 +15,7 @@ export class GameInfoCommand extends CommandBase<ChatMessage> {
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
 
-        const gameInfo = await apiManager?.getGameInfo();
+        const gameInfo = await apiManager.getGameInfo();
 
         if (!!gameInfo) {
             chatManager.sendMessage(`There are currently ${gameInfo.numberOfStreams} different streams of ${gameInfo.gameName}, with a total of ${gameInfo.totalViewers} viewers... what are you doing HERE?`);

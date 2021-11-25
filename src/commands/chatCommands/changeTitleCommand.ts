@@ -23,7 +23,7 @@ export class ChangeTitleCommand extends CommandBase<ChatMessage> {
 
         const newTitle = chatMessage.message.replace('!title ', '');
 
-        await apiManager?.updateTitle(newTitle);
+        await apiManager.updateTitle(newTitle);
 
         await chatManager.sendMessage(`Updated the title to ${newTitle}`);
     };
