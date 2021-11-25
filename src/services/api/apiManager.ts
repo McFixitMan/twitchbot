@@ -107,7 +107,7 @@ export const createApiManager = async (authProvider: AuthProvider, props?: ApiMa
 
     const apiManager = new ApiManager(authProvider);
 
-    console.log(chalk.greenBright(`🚀 ApiManager initialized!`));
+    console.log(chalk.blue(`🚀 ApiManager initialized!`));
 
     return apiManager;
 };

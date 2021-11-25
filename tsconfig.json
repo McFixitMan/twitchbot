@@ -25,5 +25,5 @@
       "./src/*",
       "./build/",
       "./types"
-  ]
+, "src/database/entities"  ]
 }

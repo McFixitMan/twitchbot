@@ -7,8 +7,8 @@ export class QueueState extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'Id' })
         id!: number;
     
-    @Column({ name: 'Value' })
-        value!: string;
+    @Column({ name: 'Code' })
+        code!: string;
 
     @Column({ name: 'Label' })
         label!: string;

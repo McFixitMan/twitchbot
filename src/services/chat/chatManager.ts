@@ -97,7 +97,7 @@ export const createChatManager = async (authProvider: AuthProvider, props?: Chat
     const chatManager = new ChatManager(authProvider);
     await chatManager.initialize(props);
 
-    console.info(chalk.greenBright(`💬 ChatManager initialized! Now listening to chat messages...`));
+    console.info(chalk.blue(`💬 ChatManager initialized! Now listening to chat messages...`));
         
     return chatManager;
 };

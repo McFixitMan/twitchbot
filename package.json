@@ -14,7 +14,7 @@
     "@twurple/chat": "^5.0.8",
     "@twurple/eventsub": "^5.0.8",
     "@twurple/pubsub": "^5.0.8",
-    "mssql": "^7.3.0",
+    "mysql": "^2.18.1",
     "typeorm": "^0.2.41"
   },
   "devDependencies": {

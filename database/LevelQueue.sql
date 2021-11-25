@@ -1,0 +1,8 @@
+CREATE TABLE LevelQueue (
+    Id INT NOT NULL AUTO_INCREMENT,
+    Title VARCHAR(50) NOT NULL,
+    QueueDescription VARCHAR(100) NULL,
+    QueueStateId INT NOT NULL,
+    CreatedAt DATETIME NOT NULL,
+    PRIMARY KEY (Id)
+);

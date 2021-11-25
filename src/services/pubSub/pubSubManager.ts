@@ -141,7 +141,7 @@ export const createPubSub = async (authProvider: AuthProvider, props?: PubSubMan
 
     await pubSubManager.initialize(authProvider, props);
 
-    console.info(chalk.greenBright(`🔄 PubSubManager initialized! Now listening to handled events: [${Object.entries(pubSubManager.listeners).map(([key, value]) => key).join(', ')}]...`));
+    console.info(chalk.blue(`🔄 PubSubManager initialized! Now listening to handled events: [${Object.entries(pubSubManager.listeners).map(([key, value]) => key).join(', ')}]...`));
 
     return pubSubManager;
 };

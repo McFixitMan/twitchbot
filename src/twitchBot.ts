@@ -43,6 +43,9 @@ export class TwitchBot {
         await this.configurePubSub(this.broadcasterAuthProvider);
         await this.configureQueueManager();
 
+        console.log(' ');
+        console.info(chalk.greenBright(`✅ TwitchBot is live!`));
+
         this.bitCommands = botCommands.bitCommands.commandList.map((cmd) => {
             return new cmd(this);
         });

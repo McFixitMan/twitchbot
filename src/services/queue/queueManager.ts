@@ -1,27 +1,20 @@
 import * as chalk from 'chalk';
 
-import { Connection, In } from 'typeorm';
 import { LEVEL_COMMAND, LEVEL_STATE, QUEUE_STATE } from './enums';
 
-import { BotState } from './entities/botState';
-import { LevelState } from './entities/levelState';
-import { Queue } from './entities/queue';
-import { QueueItem } from './entities/queueItem';
+import { BotState } from '../../database/entities/botState';
+import { In } from 'typeorm';
+import { LevelState } from '../../database/entities/levelState';
+import { Queue } from '../../database/entities/queue';
+import { QueueItem } from '../../database/entities/queueItem';
 import { QueueRecord } from './types/queueRecord';
-import { QueueState } from './entities/queueState';
-import { databaseInitializer } from './database';
+import { QueueState } from '../../database/entities/queueState';
 import { getDateDifference } from '../../utility/dateHelper';
 
 export class QueueManager {
-    private _dbConnection: Connection | undefined;
-
     constructor() {
         // Ok, relax eslint
     }
-
-    initialize = async(): Promise<void> => {
-        this._dbConnection = await databaseInitializer();
-    };
 
     getCurrentQueue = async (): Promise<Queue | undefined> => {
         const botState = await BotState.findOne(1);
@@ -199,7 +192,7 @@ export class QueueManager {
     
         const progressLevelState = await LevelState.findOne({
             where: {
-                value: 'inprogress',
+                code: 'inprogress',
             },
         });
     
@@ -240,7 +233,7 @@ export class QueueManager {
     
         const progressLevelState = await LevelState.findOne({
             where: {
-                value: 'inprogress',
+                code: 'inprogress',
             },
         });
     
@@ -280,7 +273,7 @@ export class QueueManager {
     
         const progressLevelState = await LevelState.findOne({
             where: {
-                value: 'inprogress',
+                code: 'inprogress',
             },
         });
     
@@ -321,7 +314,7 @@ export class QueueManager {
     
         const progressLevelState = await LevelState.findOne({
             where: {
-                value: 'inprogress',
+                code: 'inprogress',
             },
         });
     
@@ -362,7 +355,7 @@ export class QueueManager {
     
         const lossState = await LevelState.findOne({
             where: {
-                value: 'loss',
+                code: 'loss',
             },
         });
     
@@ -396,7 +389,7 @@ export class QueueManager {
     
         const winState = await LevelState.findOne({
             where: {
-                value: 'win',
+                code: 'win',
             },
         });
     
@@ -468,14 +461,14 @@ export class QueueManager {
         const levelStates = await LevelState.find();
     
         if (!!botState.activeQueueItem) {
-            botState.activeQueueItem.levelState = levelStates.find(x => x.value === 'unplayed');
+            botState.activeQueueItem.levelState = levelStates.find(x => x.code === 'unplayed');
             await botState.activeQueueItem.save();
         }
     
         botState.activeQueueItem = nextEntry;
         botState.startedAt = new Date();
     
-        nextEntry.levelState = levelStates.find(x => x.value === 'inprogress');
+        nextEntry.levelState = levelStates.find(x => x.code === 'inprogress');
     
         await botState.save();
         return await nextEntry.save();
@@ -527,7 +520,7 @@ export class QueueManager {
     
         const queueState = await QueueState.findOne({
             where: {
-                value: 'closed',
+                code: 'closed',
             },
         });
     
@@ -615,13 +608,13 @@ export class QueueManager {
     
         const winState = await LevelState.findOne({
             where: {
-                value: 'win',
+                code: 'win',
             },
         });
     
         const lossState = await LevelState.findOne({
             where: {
-                value: 'loss',
+                code: 'loss',
             },
         });
     
@@ -663,9 +656,7 @@ export class QueueManager {
 export const createQueueManager = async (): Promise<QueueManager> => {
     const qm = new QueueManager();
 
-    await qm.initialize();
-
-    console.info(chalk.greenBright(`📖 QueueManager initialized! Now accepting queue commands...`));
+    console.info(chalk.blue(`📖 QueueManager initialized! Now accepting queue commands...`));
 
     return qm;
 };

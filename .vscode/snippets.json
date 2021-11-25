@@ -1,0 +1,126 @@
+{
+	"New Chat Command": {
+		"prefix": ["chatcommand"],
+		"body": [
+			"import { ChatMessage } from '../../services/chat';",
+			"import { CommandBase } from '../base/botCommand';",
+			"import { TwitchBot } from '../../twitchBot';",
+			"",
+			"export class ${1:NewCommand} extends CommandBase<ChatMessage> {",
+			"",
+				"\tconstructor(twitchBot: TwitchBot) {",
+					"\t\tsuper(twitchBot);",
+				"\t}",
+				"",
+				"\tisCompatible = (chatMessage: ChatMessage): boolean => {",
+					"\t\treturn false;",
+				"\t};",
+				"",
+				"\texecute = async (chatMessage: ChatMessage): Promise<void> => {",
+					"\t\tconst { chatManager } = this.twitchBot;",
+				"\t};",
+			"}"
+		],
+		"description": "Boilerplate for a new chat command"
+	},
+
+	"New Bit Command": {
+		"prefix": ["bitcommand"],
+		"body": [
+			"import { BitMessage } from '../../services/pubSub';",
+			"import { CommandBase } from '../base/botCommand';",
+			"import { TwitchBot } from '../../twitchBot';",
+			"",
+			"export class ${1:NewCommand} extends CommandBase<BitMessage> {",
+			"",
+				"\tconstructor(twitchBot: TwitchBot) {",
+					"\t\tsuper(twitchBot);",
+				"\t}",
+				"",
+				"\tisCompatible = (bitMessage: BitMessage): boolean => {",
+					"\t\treturn false;",
+				"\t};",
+				"",
+				"\texecute = async (bitMessage: BitMessage): Promise<void> => {",
+					"\t\tconst { chatManager } = this.twitchBot;",
+				"\t};",
+			"}"
+		],
+		"description": "Boilerplate for a new bit command"
+	},
+
+	"New Redemption Command": {
+		"prefix": ["redemptioncommand"],
+		"body": [
+			"import { RedemptionMessage } from '../../services/pubSub';",
+			"import { CommandBase } from '../base/botCommand';",
+			"import { TwitchBot } from '../../twitchBot';",
+			"",
+			"export class ${1:NewCommand} extends CommandBase<RedemptionMessage> {",
+			"",
+				"\tconstructor(twitchBot: TwitchBot) {",
+					"\t\tsuper(twitchBot);",
+				"\t}",
+				"",
+				"\tisCompatible = (redemptionMessage: RedemptionMessage): boolean => {",
+					"\t\treturn false;",
+				"\t};",
+				"",
+				"\texecute = async (redemptionMessage: RedemptionMessage): Promise<void> => {",
+					"\t\tconst { chatManager } = this.twitchBot;",
+				"\t};",
+			"}"
+		],
+		"description": "Boilerplate for a new bit command"
+	},
+
+	"New Sub Command": {
+		"prefix": ["subcommand"],
+		"body": [
+			"import { SubMessage } from '../../services/pubSub';",
+			"import { CommandBase } from '../base/botCommand';",
+			"import { TwitchBot } from '../../twitchBot';",
+			"",
+			"export class ${1:NewCommand} extends CommandBase<SubMessage> {",
+			"",
+				"\tconstructor(twitchBot: TwitchBot) {",
+					"\t\tsuper(twitchBot);",
+				"\t}",
+				"",
+				"\tisCompatible = (subMessage: SubMessage): boolean => {",
+					"\t\treturn false;",
+				"\t};",
+				"",
+				"\texecute = async (subMessage: SubMessage): Promise<void> => {",
+					"\t\tconst { chatManager } = this.twitchBot;",
+				"\t};",
+			"}"
+		],
+		"description": "Boilerplate for a new bit command"
+	},
+
+	"New Whisper Command": {
+		"prefix": ["whispercommand"],
+		"body": [
+			"import { WhisperMessage } from '../../services/pubSub';",
+			"import { CommandBase } from '../base/botCommand';",
+			"import { TwitchBot } from '../../twitchBot';",
+			"",
+			"export class ${1:NewCommand} extends CommandBase<WhisperMessage> {",
+			"",
+				"\tconstructor(twitchBot: TwitchBot) {",
+					"\t\tsuper(twitchBot);",
+				"\t}",
+				"",
+				"\tisCompatible = (whisperMessage: WhisperMessage): boolean => {",
+					"\t\treturn false;",
+				"\t};",
+				"",
+				"\texecute = async (whisperMessage: WhisperMessage): Promise<void> => {",
+					"\t\tconst { chatManager } = this.twitchBot;",
+				"\t};",
+			"}"
+		],
+		"description": "Boilerplate for a new bit command"
+	}
+}

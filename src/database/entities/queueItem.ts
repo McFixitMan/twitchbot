@@ -4,7 +4,7 @@ import { BotState } from './botState';
 import { LevelState } from './levelState';
 import { Queue } from './queue';
 
-@Entity({ name: 'QueueItem' })
+@Entity({ name: 'LevelQueueItem' })
 export class QueueItem extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'Id' })
         id!: number;
@@ -28,7 +28,7 @@ export class QueueItem extends BaseEntity {
         createdAt!: Date;
 
     @ManyToOne(type => Queue, queue => queue.queueItems)
-    @JoinColumn({ name: 'queueId' })
+    @JoinColumn({ name: 'levelQueueId' })
         queue?: Queue;
 
     @ManyToOne(type => LevelState, levelState => levelState.queueItems, { eager: true })

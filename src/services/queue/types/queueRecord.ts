@@ -1,4 +1,4 @@
-import { Queue } from '../entities/queue';
+import { Queue } from '../../../database/entities/queue';
 
 export interface QueueRecord {
     queue: Queue;

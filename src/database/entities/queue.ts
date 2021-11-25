@@ -4,7 +4,7 @@ import { BotState } from './botState';
 import { QueueItem } from './queueItem';
 import { QueueState } from './queueState';
 
-@Entity({ name: 'Queue' })
+@Entity({ name: 'LevelQueue' })
 export class Queue extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'Id' })
         id!: number;
@@ -12,7 +12,7 @@ export class Queue extends BaseEntity {
     @Column({ name: 'Title' })
         title!: string;
 
-    @Column({ name: 'Description' })
+    @Column({ name: 'QueueDescription' })
         description?: string;
 
     @Column({ name: 'CreatedAt' })

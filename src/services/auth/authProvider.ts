@@ -1,39 +1,47 @@
-import * as path from 'path';
-
 import { AccessToken, RefreshingAuthProvider } from '@twurple/auth';
 
+import { BotTokens } from '../../database/entities/botTokens';
 import { botConfig } from '../../config';
-import { promises as fs } from 'fs';
 
 const _clientId = botConfig.auth.clientId;
 const _clientSecret = botConfig.auth.clientSecret;
 
-const broadcasterTokenPath = path.resolve(__dirname, './broadcasterTokens.json');
-const botTokenPath = path.resolve(__dirname, './botTokens.json');
+type TokenOwnerType = 'broadcaster' | 'bot';
 
-type TokenOwner = 'broadcaster' | 'bot';
+const getTokenData = async (tokenOwner: TokenOwnerType): Promise<BotTokens> => {
+    const tokens = await BotTokens.findOne({
+        where: {
+            tokenOwner: tokenOwner,
+        },
+    });
 
-const getTokenData = async (tokenOwner: TokenOwner): Promise<AccessToken> => {
-    const path = tokenOwner === 'broadcaster' 
-        ? broadcasterTokenPath 
-        : botTokenPath;
+    if (!tokens) {
+        throw new Error(`Unable to find tokens for ${tokenOwner}`);
+    }
 
-    const tokenData = await fs.readFile(path, 'utf-8');
-
-    return JSON.parse(tokenData);
+    return tokens;
 };
 
-const updateTokenData = async (tokenOwner: TokenOwner, newTokenData: AccessToken): Promise<void> => {
-    const stringifiedData = JSON.stringify(newTokenData, null, 4);
-    
-    const path = tokenOwner === 'broadcaster' 
-        ? broadcasterTokenPath 
-        : botTokenPath;
+const updateTokenData = async (tokenOwner: TokenOwnerType, newTokenData: AccessToken): Promise<void> => {
+    const tokens = await BotTokens.findOne({
+        where: {
+            tokenOwner: tokenOwner,
+        },
+    });
 
-    return await fs.writeFile(path, stringifiedData, 'utf-8');
+    if(!tokens) {
+        throw new Error(`Unable to find tokens for ${tokenOwner}`);
+    }
+
+    tokens.accessToken = newTokenData.accessToken;
+    tokens.refreshToken = newTokenData.refreshToken ?? '';
+    tokens.expiresIn = newTokenData.expiresIn ?? 0;
+    tokens.obtainmentTimestamp = newTokenData.obtainmentTimestamp;
+
+    await tokens.save();
 };
 
-export const createAuthProvider = async (owner: TokenOwner): Promise<RefreshingAuthProvider> => {
+export const createAuthProvider = async (owner: TokenOwnerType): Promise<RefreshingAuthProvider> => {
     if (!_clientId || !_clientSecret) {
         throw new Error(`Unable to create auth provider, missing:${!_clientId && ' clientId'}${!_clientSecret && ' clientSecret'}`);
     }
