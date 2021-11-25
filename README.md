@@ -2,6 +2,7 @@
 This should probably be automated to some extent in the future, but this is the awful process I'm using now...
 
 Replace:
+
     - YOUR_CLIENT_ID with your client ID
     - YOUR_REDIRECT_URI with the redirect URI configured for your bot. For now I'm just using localhost and taking the returned code from the query param to do this manually, could potentially have a webhost in the future to handle this stuff but I don't care enough for now
     - Modify scopes in the 'scope' query param (see: https://dev.twitch.tv/docs/authentication#scopes) for your needs... Since this is all in my control I'm going to give it literally every scope I can find to mess around with things
