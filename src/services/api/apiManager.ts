@@ -3,6 +3,7 @@ import * as chalk from 'chalk';
 import { ApiClient } from '@twurple/api';
 import { AuthProvider } from '@twurple/auth/lib';
 import { botConfig } from '../../config';
+import { getDateDifference } from '../../utility/dateHelper';
 
 interface ApiManagerProps {
 
@@ -105,6 +106,18 @@ export class ApiManager {
         return subs.data
             .filter(sub => sub.userId !== this._broadcasterId)
             .map(sub => sub.userDisplayName);
+    };
+
+    getFollowAge = async(userId: string): Promise<string | undefined> => {
+        const follow = await this.apiClient.users.getFollowFromUserToBroadcaster(userId, this._broadcasterId);
+
+        if (!follow) {
+            return undefined;
+        }
+
+        const age = getDateDifference(follow.followDate, new Date());
+        
+        return age;
     };
 }
 
