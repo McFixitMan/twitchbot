@@ -83,7 +83,7 @@ export class ApiManager {
         return streams.data
             .filter((stream) => stream.userId !== this._broadcasterId)
             .sort((a, b) => b.viewers - a.viewers)
-            .map((stream) => `${stream.userDisplayName} (${stream.viewers} viewers)`);
+            .map((stream) => `${stream.userDisplayName} (${stream.viewers})`);
     };
 
     getUptimeInSeconds = async(): Promise<number> => {

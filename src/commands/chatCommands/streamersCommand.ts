@@ -21,7 +21,9 @@ export class StreamersCommand extends CommandBase<ChatMessage> {
         const streamersList = await apiManager?.getOtherStreamers();
         
         if (!!streamersList) {
-            await chatManager.sendMessage(streamersList?.join(' | '));
+            for (const streamer of streamersList) {
+                await chatManager.sendMessage(streamer);
+            }
         }
     };
 }
