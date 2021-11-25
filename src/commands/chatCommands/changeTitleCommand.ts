@@ -21,7 +21,7 @@ export class ChangeTitleCommand extends CommandBase<ChatMessage> {
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
 
-        const newTitle = chatMessage.message.replace('!t ', '');
+        const newTitle = chatMessage.message.replace('!title ', '');
 
         await apiManager?.updateTitle(newTitle);
 
