@@ -33,5 +33,6 @@ export class SkipQueueRedemptionCommand extends CommandBase<RedemptionMessage> {
         const updatedQueueItem = await queueManager.setUserQueueItemAsSkip(redemptionMessage.userName);
 
         await chatManager.sendMessage(`${redemptionMessage.userDisplayName}, you've skipped the queue with your level ${updatedQueueItem.levelCode}!`);
+        await apiManager.fulfillRedemption(SKIP_QUEUE_REDEMPTION_REWARD_ID, redemptionMessage.id);
     };
 }
