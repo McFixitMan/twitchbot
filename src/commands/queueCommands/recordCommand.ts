@@ -8,7 +8,7 @@ export class RecordCommand extends CommandBase<ChatMessage> {
     }
 
     isCompatible = (chatMessage: ChatMessage): boolean => {
-        return chatMessage.message.toLowerCase() === '!leave';
+        return chatMessage.message.toLowerCase() === '!record';
     };
 
     execute = async (chatMessage: ChatMessage): Promise<void> => {
