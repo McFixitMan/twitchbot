@@ -2,9 +2,11 @@ import * as chalk from 'chalk';
 
 import { Connection, createConnection } from 'typeorm';
 
-import { botConfig } from '../config';
+import { getBotConfig } from '../config';
 
 export const databaseInitializer = async (): Promise<Connection> => {
+
+    const botConfig = getBotConfig();
 
     const connection = await createConnection({
         type: 'mysql',

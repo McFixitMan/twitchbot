@@ -1,3 +1,3 @@
-import { botConfig } from './config';
+import { botConfig, getBotConfig } from './config';
 
-export { botConfig };
+export { botConfig, getBotConfig };

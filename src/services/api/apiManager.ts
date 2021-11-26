@@ -1,8 +1,9 @@
 import * as chalk from 'chalk';
 
-import { ApiClient } from '@twurple/api';
+import { ApiClient, HelixPrediction } from '@twurple/api';
+
 import { AuthProvider } from '@twurple/auth/lib';
-import { botConfig } from '../../config';
+import { getBotConfig } from '../../config';
 import { getDateDifference } from '../../utility/dateHelper';
 
 interface ApiManagerProps {
@@ -12,7 +13,7 @@ interface ApiManagerProps {
 export class ApiManager {
     public apiClient: ApiClient;
 
-    private _channelName: string = botConfig.broadcaster.username;
+    private _channelName: string = getBotConfig().broadcaster.username;
     private _broadcasterId: string = '';
 
     constructor(authProvider: AuthProvider) {
@@ -118,6 +119,123 @@ export class ApiManager {
         const age = getDateDifference(follow.followDate, new Date());
         
         return age;
+    };
+
+    getBannedUsers = async(): Promise<Array<string>> => {
+        const bannedUsers = await this.apiClient.moderation.getBannedUsers(this._broadcasterId);
+        
+        if (!bannedUsers || bannedUsers.data.length === 0) {
+            return [];
+        }
+
+        return bannedUsers.data.map(banned => banned.userDisplayName);
+    };
+
+    getModerators = async(): Promise<Array<string>> => {
+        const mods = await this.apiClient.moderation.getModerators(this._broadcasterId);
+
+        if(!mods || mods.data.length === 0) {
+            return [];
+        }
+
+        return mods.data.map(mod => mod.userDisplayName);
+    };
+
+    getActivePrediction = async(): Promise<HelixPrediction | undefined> => {
+        const predictions = await this.apiClient.predictions.getPredictions(this._broadcasterId);
+
+        const activePrediction = predictions.data.find(prediction => prediction.status === 'ACTIVE' || prediction.status === 'LOCKED');
+
+        return activePrediction ?? undefined;
+    };
+
+    createPrediction = async(title: string, lockedAfterSeconds: number, lockedCallback?: () => void): Promise<void> => {
+        const activePrediction = await this.getActivePrediction();
+        if (!!activePrediction) {
+            throw new Error('There is already an active prediction!');
+        }
+        
+        const prediction = await this.apiClient.predictions.createPrediction(this._broadcasterId, {
+            autoLockAfter: lockedAfterSeconds,
+            outcomes: ['Yes', 'No'],
+            title: title,
+        });
+
+        // this.activePrediction = prediction;
+
+        const predictionId = prediction.id;
+
+        setTimeout(async() => {
+            const currentActivePrediction = await this.getActivePrediction();
+            if(!!currentActivePrediction && currentActivePrediction.id === predictionId) {
+                lockedCallback?.();
+            }
+        }, lockedAfterSeconds * 1000);
+    };
+
+    resolvePrediction = async(result: 1 | 2): Promise<void> => {
+        const activePrediction = await this.getActivePrediction();
+        if (!activePrediction) {
+            throw new Error('There is no active prediction!');
+        }
+
+        await this.apiClient.predictions.resolvePrediction(this._broadcasterId, activePrediction.id, activePrediction.outcomes[result - 1].id);
+    };
+
+    cancelPrediction = async(): Promise<void> => {
+        const activePrediction = await this.getActivePrediction();
+        if (!activePrediction) {
+            throw new Error('There is no active prediction!');
+        }
+
+        await this.apiClient.predictions.cancelPrediction(this._broadcasterId, activePrediction.id);
+    };
+
+    refundRedemption = async(rewardId: string, redemptionId: string): Promise<void> => {
+        const redemption = await this.apiClient.channelPoints.getRedemptionById(this._broadcasterId, rewardId, redemptionId);
+        
+        if (!redemption) {
+            throw new Error('Redemption not found');
+        }
+
+        await redemption.updateStatus('CANCELED');
+    };
+
+    fulfillRedemption = async(rewardId: string, redemptionId: string): Promise<void> => {
+        const redemption = await this.apiClient.channelPoints.getRedemptionById(this._broadcasterId, rewardId, redemptionId);
+
+        if (!redemption) {
+            throw new Error('Redemption not found');
+        }
+
+        await redemption.updateStatus('FULFILLED');
+    };
+
+    /**
+     * Dont actually use this for any commands dummy, its just a way to create rewards that can be controlled by the bot account
+     */
+    createReward = async(): Promise<void> => {
+        const customReward = await this.apiClient.channelPoints.createCustomReward(this._broadcasterId, {
+            cost: 50,
+            title: 'Start a prediction',
+            autoFulfill: false,
+            prompt: `Enter what you want the prediction to be - the available outcomes will be "Yes" or "No". WARNING: Stupid and/or unfair predictions will be cancelled and YOU WILL NOT BE REFUNDED`,
+            userInputRequired: true,
+
+        });
+
+        console.log(customReward);
+    };
+
+    /**
+     * Dont actually use this for any commands dummy, its just a way to update rewards that were created by the bot account
+     */
+    updateReward = async(): Promise<void> => {
+        const bleh = await this.apiClient.channelPoints.updateCustomReward(this._broadcasterId, '3da6a575-9af4-4305-92d2-422921849cbe', {
+            cost: 15000,
+        });
+
+        console.log(bleh);
     };
 }
 

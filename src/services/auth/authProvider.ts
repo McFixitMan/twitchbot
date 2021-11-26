@@ -1,10 +1,7 @@
 import { AccessToken, RefreshingAuthProvider } from '@twurple/auth';
 
 import { BotTokens } from '../../database/entities/botTokens';
-import { botConfig } from '../../config';
-
-const _clientId = botConfig.auth.clientId;
-const _clientSecret = botConfig.auth.clientSecret;
+import { getBotConfig } from '../../config';
 
 type TokenOwnerType = 'broadcaster' | 'bot';
 
@@ -42,15 +39,17 @@ const updateTokenData = async (tokenOwner: TokenOwnerType, newTokenData: AccessT
 };
 
 export const createAuthProvider = async (owner: TokenOwnerType): Promise<RefreshingAuthProvider> => {
-    if (!_clientId || !_clientSecret) {
-        throw new Error(`Unable to create auth provider, missing:${!_clientId && ' clientId'}${!_clientSecret && ' clientSecret'}`);
+    const botConfig = getBotConfig();
+
+    if (!botConfig.auth.clientId || !botConfig.auth.clientSecret) {
+        throw new Error(`Unable to create auth provider, missing:${!botConfig.auth.clientId && ' clientId'}${!botConfig.auth.clientSecret && ' clientSecret'}`);
     }
 
     const tokenData = await getTokenData(owner);
 
     const authProvider = new RefreshingAuthProvider({
-        clientId: _clientId,
-        clientSecret: _clientSecret,
+        clientId: botConfig.auth.clientId,
+        clientSecret: botConfig.auth.clientSecret,
 
         onRefresh: async (newTokenData) => {
             await updateTokenData(owner, newTokenData);

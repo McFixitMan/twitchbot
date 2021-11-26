@@ -4,7 +4,7 @@ import { AuthProvider } from '@twurple/auth/lib';
 import { ChatClient } from '@twurple/chat';
 import { Listener } from '@d-fischer/typed-event-emitter/lib';
 import { TwitchPrivateMessage } from '@twurple/chat/lib/commands/TwitchPrivateMessage';
-import { botConfig } from '../../config';
+import { getBotConfig } from '../../config';
 
 export type ChatListenerType = 'message';
 
@@ -23,7 +23,7 @@ export class ChatManager {
     public chatClient: ChatClient;
     public listeners: Partial<Record<ChatListenerType, Listener>> = {};
 
-    private _channelName: string = botConfig.broadcaster.username;
+    private _channelName: string = getBotConfig().broadcaster.username;
     private _props: ChatManagerProps = {};
     private _permits: Array<string> = [];
 
@@ -50,7 +50,9 @@ export class ChatManager {
     };
 
     sendMessage = async (message: string): Promise<void> => {
+        const now = new Date();
         await this.chatClient.say(this._channelName, message);
+        console.log(chalk.yellowBright(`[${now.toLocaleTimeString()}] [BOT]: ${message}`));
     };
 
     timeoutUser = async (username: string, timeoutSeconds?: number, reason?: string): Promise<void> => {

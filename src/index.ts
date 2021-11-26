@@ -1,7 +1,11 @@
 import * as chalk from 'chalk';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 import { TwitchBot } from './twitchBot';
 import { databaseInitializer } from './database/database';
+
+dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const startServer = async(): Promise<void> => {
     await databaseInitializer();

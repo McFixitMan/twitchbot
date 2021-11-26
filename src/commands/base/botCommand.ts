@@ -1,5 +1,5 @@
 import { TwitchBot } from '../../twitchBot';
-import { botConfig } from '../../config';
+import { getBotConfig } from '../../config';
 
 export interface BotCommand<MessageType> {
     name: string;
@@ -15,7 +15,7 @@ export abstract class CommandBase<MessageType> implements BotCommand<MessageType
     constructor(twitchBot: TwitchBot) {
         this.twitchBot = twitchBot;
         this.name = this.constructor.name;
-        this.broadcasterName = botConfig.broadcaster.username;
+        this.broadcasterName = getBotConfig().broadcaster.username;
     }
 
     /**

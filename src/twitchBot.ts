@@ -84,9 +84,10 @@ export class TwitchBot {
         this.chatManager = await createChatManager(authProvider, {
             onMessage: async (chatMessage) => {
                 const now = new Date();
-                console.log(`[${now.toLocaleTimeString()}] ${chatMessage.msg.userInfo.displayName}: ${chatMessage.message}`);
+                console.log(chalk.whiteBright(`[${now.toLocaleTimeString()}] ${chatMessage.msg.userInfo.displayName}: ${chatMessage.message}`));
 
                 // Check if message contains a link
+                // https://stackoverflow.com/a/42044642
                 if (!!chatMessage.message.match(/^((?:https?:\/\/)?[^./]+(?:\.[^./]+)+(?:\/.*)?)$/)) {
                     const { userInfo } = chatMessage.msg;
 
@@ -94,6 +95,7 @@ export class TwitchBot {
                     if (!userInfo.isBroadcaster) {
                         if (!await this.chatManager.isUserPermitted(userInfo.userName)) {
                             await this.chatManager.deleteMessage(chatMessage.msg.id);
+                            
                             await this.chatManager.sendMessage(`What is this, Reddit? No links ${userInfo.displayName}!`);
 
                             return;
