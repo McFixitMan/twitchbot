@@ -24,6 +24,9 @@ export class QueueItem extends BaseEntity {
     @Column({ name: 'IsSub' })
         isSub!: boolean;
 
+    @Column({ name: 'IsSkip' })
+        isSkip!: boolean;
+
     @Column({ name: 'CreatedAt' })
         createdAt!: Date;
 

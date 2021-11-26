@@ -22,7 +22,7 @@ export class ListCommand extends CommandBase<ChatMessage> {
             chatManager.sendMessage('There are no levels in the queue!');
         } else {
             const isSingular = queueItems.length === 1;
-            chatManager.sendMessage(`There ${isSingular ? 'is' : 'are'} ${queueItems.length} ${isSingular ? 'level' : 'levels'} in the queue: ${queueItems.map((x) => `${x.username}`).join(', ')}`);
+            chatManager.sendMessage(`There ${isSingular ? 'is' : 'are'} ${queueItems.length} ${isSingular ? 'level' : 'levels'} in the queue: ${queueItems.map((x) => `${x.username}${x.isSkip ? ' (SKIP!)' : ''}`).join(', ')}`);
         }
     };
 }

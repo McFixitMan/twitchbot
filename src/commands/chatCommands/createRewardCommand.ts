@@ -19,7 +19,7 @@ export class CreateRewardCommand extends CommandBase<ChatMessage> {
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
 
-        // await apiManager.createReward();
-        await apiManager.updateReward();
+        await apiManager.createReward();
+        //await apiManager.updateReward();
     };
 }

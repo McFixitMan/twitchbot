@@ -27,12 +27,23 @@ export class CodeCommand extends CommandBase<ChatMessage> {
             // If we have a query it means someone included a username in the command
             const queueItem = await queueManager.getUserQueueItem(query);
 
-            await chatManager.sendMessage(`The level ${query} has in the queue is ${queueItem.levelCode}`);
+            if (!queueItem) {
+                await chatManager.sendMessage(`${query} is not in the queue!`);
+            } else {
+                await chatManager.sendMessage(`The level ${query} has in the queue is ${queueItem.levelCode}`);
+            }
+            
         } else {
             // No query: get the code for the user that asked
             const queueItem = await queueManager.getUserQueueItem(userInfo.userName);
 
-            await chatManager.sendMessage(`${userInfo.displayName}, the level you have in the queue is ${queueItem.levelCode}`);
+            if (!queueItem) {
+                await chatManager.sendMessage(`${userInfo.displayName} is not in the queue!`);
+            } else {
+                await chatManager.sendMessage(`${userInfo.displayName}, the level you have in the queue is ${queueItem.levelCode}`);
+            }
+
+            
         }
     };
 }

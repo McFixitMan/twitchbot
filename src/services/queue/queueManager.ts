@@ -29,14 +29,19 @@ export class QueueManager {
             throw new Error('There is no current queue');
         }
 
-        return QueueItem.find({
+        const queueItems = await QueueItem.find({
             where: {
                 queue: currentQueue,
                 levelState: LEVEL_STATE.unplayed,
             },
-            order: {
-                createdAt: 'ASC',
-            },
+        });
+
+        return queueItems.sort((a, b) => {
+            if (a.isSkip === b.isSkip) {
+                return a.createdAt.getTime() - b.createdAt.getTime();
+            } else {
+                return a.isSkip ? -1 : 1;
+            }
         });
     };
 
@@ -128,6 +133,7 @@ export class QueueManager {
         queueItem.isMod = isMod;
         queueItem.isVip = isVip;
         queueItem.isSub = isSub;
+        queueItem.isSkip = false;
 
         return await queueItem.save();
     };
@@ -187,7 +193,7 @@ export class QueueManager {
         }
     
         if (!!botState.activeQueueItem) {
-            throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
+            throw new Error(`Don't be a dummy, you have to deal with the current level first!`);
         }
     
         const progressLevelState = await LevelState.findOne({
@@ -197,7 +203,7 @@ export class QueueManager {
         });
     
         if (!progressLevelState) {
-            throw new Error('Couldnt find the right level state... blame McFixit for this travesty');
+            throw new Error('Couldnt find the right level state... bad bot is bad');
         }
     
         botState.lastCommand = LEVEL_COMMAND.next;
@@ -493,7 +499,7 @@ export class QueueManager {
         return diff;
     };
 
-    getUserQueueItem = async(username: string): Promise<QueueItem> => {
+    getUserQueueItem = async(username: string): Promise<QueueItem | undefined> => {
         const currentQueue = await this.getCurrentQueue();
     
         if (!currentQueue) {
@@ -509,10 +515,22 @@ export class QueueManager {
         });
     
         if (!userEntry) {
-            throw new Error(`${username} is not in the queue!`);
+            return undefined;
         }
     
         return userEntry;
+    };
+
+    setUserQueueItemAsSkip = async(username: string): Promise<QueueItem> => {
+        const queueItem = await this.getUserQueueItem(username);
+
+        if(!queueItem) {
+            throw new Error(`${username} is not in the queue`);
+        }
+
+        queueItem.isSkip = true;
+
+        return await queueItem.save();
     };
 
     createNewQueue = async(title?: string, description?: string): Promise<Queue> => {

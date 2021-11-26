@@ -217,11 +217,9 @@ export class ApiManager {
     createReward = async(): Promise<void> => {
         const customReward = await this.apiClient.channelPoints.createCustomReward(this._broadcasterId, {
             cost: 50,
-            title: 'Start a prediction',
+            title: 'Skip the queue',
             autoFulfill: false,
-            prompt: `Enter what you want the prediction to be - the available outcomes will be "Yes" or "No". WARNING: Stupid and/or unfair predictions will be cancelled and YOU WILL NOT BE REFUNDED`,
-            userInputRequired: true,
-
+            userInputRequired: false,
         });
 
         console.log(customReward);
