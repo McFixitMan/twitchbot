@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 
-import { ApiClient, HelixPrediction } from '@twurple/api';
+import { ApiClient, HelixPrediction, HelixUser } from '@twurple/api';
 
 import { AuthProvider } from '@twurple/auth/lib';
 import { getBotConfig } from '../../config';
@@ -234,6 +234,24 @@ export class ApiManager {
         });
 
         console.log(bleh);
+    };
+
+    getUserByUsername = async(username: string): Promise<HelixUser | undefined> => {
+        const user = await this.apiClient.users.getUserByName(username);
+
+        return user ?? undefined;
+    };
+
+    getChannelGameNameByUsername = async(username: string): Promise<string | undefined> => {
+        const user = await this.getUserByUsername(username);
+
+        if (!user) {
+            return undefined;
+        }
+
+        const channelInfo = await this.apiClient.channels.getChannelInfo(user.id);
+        
+        return channelInfo?.gameName;
     };
 }
 
