@@ -13,13 +13,23 @@ import { getDateDifference } from '../../utility/dateHelper';
 
 export class QueueManager {
     constructor() {
-        // Ok, relax eslint
+        
     }
-
-    getCurrentQueue = async (): Promise<Queue | undefined> => {
+    
+    getBotState = async(): Promise<BotState> => {
         const botState = await BotState.findOne(1);
 
-        return botState?.activeQueue ?? undefined;
+        if (!botState) {
+            throw new Error('No bot state. This kills the bot');
+        }
+
+        return botState;
+    };
+
+    getCurrentQueue = async (): Promise<Queue | undefined> => {
+        const botState = await this.getBotState();
+
+        return botState.activeQueue ?? undefined;
     };
 
     getCurrentQueueItems = async(): Promise<Array<QueueItem>> => {
@@ -46,15 +56,15 @@ export class QueueManager {
     };
 
     getCurrentLevel = async(): Promise<QueueItem | undefined> => {
-        const botState = await BotState.findOne(1);
+        const botState = await this.getBotState();
 
-        return botState?.activeQueueItem ?? undefined;
+        return botState.activeQueueItem ?? undefined;
     };
 
     removeCurrentLevel = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
+        const botState = await this.getBotState();
 
-        const currentLevel = botState?.activeQueueItem;
+        const currentLevel = botState.activeQueueItem;
         if (!currentLevel) {
             throw new Error('No current level');
         }
@@ -110,7 +120,7 @@ export class QueueManager {
         });
 
         if (!!existingEntry) {
-            throw new Error(`${username}, you're already in the queue!`);
+            throw new Error(`${username}, you're already in the queue! You can use the !replace command to change your entry`);
         }
 
         const currentEntry = await this.getCurrentLevel();
@@ -186,11 +196,7 @@ export class QueueManager {
     };
 
     setNextLevel = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...uh oh.');
-        }
+        const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
             throw new Error(`Don't be a dummy, you have to deal with the current level first!`);
@@ -228,10 +234,7 @@ export class QueueManager {
     };
 
     setSubNextLevel = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...uh oh.');
-        }
+        const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
             throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
@@ -268,11 +271,8 @@ export class QueueManager {
     };
 
     setRandomLevel = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...uh oh.');
-        }
-    
+        const botState = await this.getBotState();
+
         if (!!botState.activeQueueItem) {
             throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
         }
@@ -309,10 +309,7 @@ export class QueueManager {
     };
 
     setSubRandomLevel = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...uh oh.');
-        }
+        const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
             throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
@@ -349,11 +346,7 @@ export class QueueManager {
     };
 
     setCurrentLevelAsLoss = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-    
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state... not good...');
-        }
+        const botState = await this.getBotState();
     
         if (!botState.activeQueueItem) {
             throw new Error('There is no current level!');
@@ -383,11 +376,7 @@ export class QueueManager {
     };
 
     setCurrentLevelAsWin = async(): Promise<QueueItem> => {
-        const botState = await BotState.findOne(1);
-        
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...uh oh.');
-        }
+        const botState = await this.getBotState();
     
         if (!botState.activeQueueItem) {
             throw new Error('There is no current level!');
@@ -459,11 +448,8 @@ export class QueueManager {
             throw new Error(`${username} has no unplayed levels in the queue!`);
         }
     
-        const botState = await BotState.findOne();
-        if (!botState) {
-            throw new Error('Unable to retrieve bot state...that\'s not good...');
-        }
-    
+        const botState = await this.getBotState();
+
         const levelStates = await LevelState.find();
     
         if (!!botState.activeQueueItem) {
@@ -481,10 +467,7 @@ export class QueueManager {
     };
 
     getPlayTime = async(): Promise<string> => {
-        const botState = await BotState.findOne();
-        if (!botState) {
-            throw new Error('Unable to get the bot state... this is likely bad...');
-        }
+        const botState = await this.getBotState();
     
         if (!botState.activeQueueItem) {
             throw new Error('There is no active item in the queue!');
@@ -552,13 +535,13 @@ export class QueueManager {
         const createdQueue = await newQueue.save();
     
         // Get our bot state and set our active queue to the one we just created
-        const botState = await BotState.findOne(1);
-        if (!!botState) {
-            botState.activeQueue = createdQueue;
-            botState.activeQueueItem = null;
-            botState.lastCommand = null;
-            await botState.save();
-        }
+        const botState = await this.getBotState();
+
+        botState.activeQueue = createdQueue;
+        botState.activeQueueItem = null;
+        botState.lastCommand = null;
+
+        await botState.save();
         
         return createdQueue;
     };
@@ -583,11 +566,7 @@ export class QueueManager {
     };
 
     endCurrentQueue = async(): Promise<void> => {
-        const botState = await BotState.findOne(1);
-    
-        if (!botState) {
-            throw new Error('No bot state found!');
-        }
+        const botState = await this.getBotState();
     
         botState.activeQueue = null;
         botState.activeQueueItem = null;
@@ -596,11 +575,7 @@ export class QueueManager {
     };
 
     loadLastQueue = async(): Promise<Queue | undefined> => {
-        const botState = await BotState.findOne(1);
-    
-        if (!botState) {
-            throw new Error('No bot state found!');
-        }
+        const botState = await this.getBotState();
     
         const lastQueue = await Queue.createQueryBuilder('queue')
             .select('queue')
@@ -608,17 +583,14 @@ export class QueueManager {
             .getOne();
     
         botState.activeQueue = lastQueue ?? null;
+
         await botState.save();
     
         return lastQueue;
     };
 
     getCurrentQueueRecord = async(): Promise<QueueRecord> => {
-        const botState = await BotState.findOne(1);
-    
-        if (!botState) {
-            throw new Error('No bot state. Thats not good. Yell at McFixit');
-        }
+        const botState = await this.getBotState();
     
         if (!botState.activeQueue) {
             throw new Error('There is no active queue!');
@@ -662,11 +634,8 @@ export class QueueManager {
     };
 
     getLastCommand = async(): Promise<string | undefined> => {
-        const botState = await BotState.findOne();
-        if (!botState) {
-            throw new Error('Theres no bot state... that means McFixit sucks at programming.');
-        }
-    
+        const botState = await this.getBotState();
+
         return botState.lastCommand ?? undefined;
     };
 }

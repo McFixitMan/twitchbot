@@ -3,6 +3,7 @@ import * as chalk from 'chalk';
 
 import { BitMessage, PubSubManager, RedemptionMessage, SubMessage, WhisperMessage, createPubSub } from './services/pubSub';
 import { ChatManager, ChatMessage, createChatManager } from './services/chat';
+import { Mm2ApiManager, createMm2ApiManager } from './services/mm2Api';
 
 import { ApiManager } from './services/api';
 import { AuthProvider } from '@twurple/auth/lib';
@@ -15,6 +16,7 @@ import { createQueueManager } from './services/queue/queueManager';
 export class TwitchBot {
     apiManager!: ApiManager;
     chatManager!: ChatManager;
+    mm2ApiManager!: Mm2ApiManager;
     pubSubManager!: PubSubManager;
     queueManager!: QueueManager;
 
@@ -39,6 +41,7 @@ export class TwitchBot {
         this.botAuthProvider = await createAuthProvider('bot');
 
         await this.configureApiManager(this.broadcasterAuthProvider);
+        await this.configureMm2ApiManager();
         await this.configureChatManager(this.botAuthProvider);
         await this.configurePubSub(this.broadcasterAuthProvider);
         await this.configureQueueManager();
@@ -78,6 +81,12 @@ export class TwitchBot {
         await this.apiManager.initialize();
 
         return this.apiManager;
+    };
+
+    private configureMm2ApiManager = async (): Promise<Mm2ApiManager> => {
+        this.mm2ApiManager = await createMm2ApiManager();
+
+        return this.mm2ApiManager;
     };
 
     private configureChatManager = async (authProvider: AuthProvider): Promise<ChatManager> => {

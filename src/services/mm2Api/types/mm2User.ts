@@ -1,0 +1,30 @@
+export interface Mm2User {
+    code: string;
+    coop_clears: number;
+    coop_plays: number;
+    country: string;
+    courses_attempted: number;
+    courses_cleared: number;
+    courses_deaths: number;
+    courses_played: number;
+    easy_highscore: number;
+    expert_highscore: number;
+    last_active_pretty: string;
+    last_uploaded_level_pretty: string;
+    likes: number;
+    maker_points: number;
+    name: string;
+    normal_highscore: number;
+    region_name: string;
+    super_expert_highscore: number;
+    uploaded_levels: number;
+    versus_disconnected: number;
+    versus_killed_by_others: number;
+    versus_kills: number;
+    versus_lose_streak: number;
+    versus_lost: number;
+    versus_plays: number;
+    versus_rank_name: string;
+    versus_streak: number;
+    versus_won: number;
+}
