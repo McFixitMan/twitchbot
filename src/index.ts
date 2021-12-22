@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 import { TwitchBot } from './twitchBot';
+import { WebServer } from './webServer';
 import { databaseInitializer } from './database/database';
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });
@@ -13,6 +14,9 @@ const startServer = async(): Promise<void> => {
     const twitchBot = new TwitchBot();
 
     await twitchBot.start();
+
+    const webServer = new WebServer();
+    webServer.start();
 };
 
 startServer();
