@@ -100,7 +100,7 @@ export class QueueManager {
         return existingEntry;
     };
 
-    addQueueItemToCurrentQueue = async (levelCode: string, username: string, isMod: boolean, isVip: boolean, isSub: boolean): Promise<QueueItem> => {
+    addQueueItemToCurrentQueue = async (levelCode: string, username: string, isMod: boolean, isVip: boolean, isSub: boolean, isMakerCode: boolean): Promise<QueueItem> => {
         const currentQueue = await this.getCurrentQueue();
 
         if (!currentQueue) {
@@ -144,6 +144,7 @@ export class QueueManager {
         queueItem.isVip = isVip;
         queueItem.isSub = isSub;
         queueItem.isSkip = false;
+        queueItem.isMakerCode = isMakerCode;
 
         return await queueItem.save();
     };

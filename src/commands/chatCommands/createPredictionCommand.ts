@@ -2,6 +2,8 @@ import { ChatMessage } from '../../services/chat';
 import { CommandBase } from '../base/botCommand';
 import { TwitchBot } from '../../twitchBot';
 
+const CREATE_PRED_REGEX = /^(?:!prediction|!pred|!startprediction|!startpred) ([\s\S]*)/i;
+
 export class CreatePredictionCommand extends CommandBase<ChatMessage> {
 
     constructor(twitchBot: TwitchBot) {
@@ -13,17 +15,26 @@ export class CreatePredictionCommand extends CommandBase<ChatMessage> {
             return false;
         }
 
-        return chatMessage.message.toLowerCase().startsWith('!prediction ');
+        const isMatch = CREATE_PRED_REGEX.test(chatMessage.message);
+
+        return isMatch;
     };
 
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { apiManager, chatManager } = this.twitchBot;
 
-        const title = chatMessage.message.toLowerCase().replace('!prediction ', '');
+        const createPredictionMatch = chatMessage.message.match(CREATE_PRED_REGEX);
+        if (!createPredictionMatch || !createPredictionMatch[1]) {
+            await chatManager.sendMessage('Command was in an invalid format to create a prediction');
+
+            return;
+        }
+
+        const predictionTitle = createPredictionMatch[1];
 
         const voteDuration = 120;
 
-        await apiManager.createPrediction(title, voteDuration, async() => {
+        await apiManager.createPrediction(predictionTitle, voteDuration, async() => {
             await chatManager.sendMessage(`The prediction is all set... Go for it ${this.broadcasterName}!`);
         });
 

@@ -5,7 +5,7 @@ import { TwitchBot } from '../../twitchBot';
 // Start with (^) either !so or !shoutout (unnamed group since we dont need to capture this)
 // Optional @ symbol
 // Group to capture user name, end
-const SHOUTOUT_REGEX = /^(?:!so|!shoutout) @?([a-zA-Z0-9_]+)$/;
+const SHOUTOUT_REGEX = /^(?:!so|!shoutout) @?([a-zA-Z0-9_]+)$/i;
 
 export class ShoutoutCommand extends CommandBase<ChatMessage> {
 

@@ -18,8 +18,11 @@ export interface Mm2LevelInfo {
     record_holder: Mm2User;
     tags_name: Array<string>;
     theme_name: string;
+    upload_time: number;
     upload_time_pretty: string;
+    uploaded: number;
     uploaded_pretty: string;
     uploader: Mm2User;
+    world_record: number;
     world_record_pretty: string;
 } 

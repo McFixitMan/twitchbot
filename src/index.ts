@@ -12,7 +12,7 @@ const startServer = async(): Promise<void> => {
 
     const twitchBot = new TwitchBot();
 
-    await twitchBot.initialize();
+    await twitchBot.start();
 };
 
 startServer();

@@ -13,7 +13,9 @@ export class CancelPredictionCommand extends CommandBase<ChatMessage> {
             return false;
         }
         
-        return chatMessage.message.toLowerCase() === '!cancel';
+        return chatMessage.message.toLowerCase() === '!cancel' ||
+            chatMessage.message.toLowerCase() === '!cancelprediction' ||
+            chatMessage.message.toLowerCase() === '!cancelpred';
     };
 
     execute = async (chatMessage: ChatMessage): Promise<void> => {

@@ -4,10 +4,13 @@ import { CloseCommand } from './closeCommand';
 import { CodeCommand } from './codeCommand';
 import { CommandList } from '../base';
 import { CurrentCommand } from './currentCommand';
+import { CurrentInfoCommand } from './currentInfoCommand';
 import { LastQueueCommand } from './lastQueueCommand';
 import { LeaveCommand } from './leaveCommand';
+import { LevelInfoCommand } from './levelInfoCommand';
 import { ListCommand } from './listCommand';
 import { LossCommand } from './lossCommand';
+import { MakerInfoCommand } from './makerInfoCommand';
 import { NewQueueCommand } from './newQueueCommand';
 import { NextCommand } from './nextCommand';
 import { NowCommand } from './nowCommand';
@@ -30,10 +33,13 @@ const commandList: CommandList<ChatMessage> = [
     CloseCommand,
     CodeCommand,
     CurrentCommand,
+    CurrentInfoCommand,
     LastQueueCommand,
     LeaveCommand,
+    LevelInfoCommand,
     ListCommand,
     LossCommand,
+    MakerInfoCommand,
     NewQueueCommand,
     NextCommand,
     NowCommand,

@@ -1,12 +1,13 @@
 import * as chalk from 'chalk';
 
-import { Mm2LevelInfo } from './types';
-import axios from 'axios';
+import { Mm2LevelInfo, Mm2User } from './types';
+import axios, { AxiosError } from 'axios';
 
 interface Mm2ApiManagerProps {
 
 }
 
+// See https://tgrcode.com/mm2/docs
 export class Mm2ApiManager {
     constructor() { 
         
@@ -15,9 +16,28 @@ export class Mm2ApiManager {
     getLevelInfo = async (levelCode: string): Promise<Mm2LevelInfo | undefined> => {
         const sanitizedCode = levelCode.replace('-', '');
 
-        const { data } = await axios.get<Mm2LevelInfo>(`https://tgrcode.com/mm2/level_info/${sanitizedCode}`);
+        try {
+            const { data } = await axios.get<Mm2LevelInfo>(`https://tgrcode.com/mm2/level_info/${sanitizedCode}`);
 
-        return data;
+            return data;
+        } catch (err) {
+            // For now we'll just treat any error as unfound
+            return undefined;
+        }
+        
+    };
+
+    getUserInfo = async (makerCode: string): Promise<Mm2User | undefined> => {
+        const sanitizedCode = makerCode.replace('-', '');
+
+        try {
+            const { data } = await axios.get<Mm2User>(`https://tgrcode.com/mm2/user_info/${sanitizedCode}`);
+
+            return data;
+        } catch (err) {
+            // For now we'll just treat any error as unfound
+            return undefined;
+        }
     };
 }
 

@@ -3,6 +3,7 @@ import * as chalk from 'chalk';
 import { ApiClient, HelixPrediction, HelixUser } from '@twurple/api';
 
 import { AuthProvider } from '@twurple/auth/lib';
+import { PREDICTION_REDEMPTION_REWARD_ID } from '../../constants/redemptions';
 import { getBotConfig } from '../../config';
 import { getDateDifference } from '../../utility/dateHelper';
 
@@ -15,6 +16,8 @@ export class ApiManager {
 
     private _channelName: string = getBotConfig().broadcaster.username;
     private _broadcasterId: string = '';
+
+    private _predictionInfo?: { id: string; redemptionMessageId?: string; } = undefined;
 
     constructor(authProvider: AuthProvider) {
         this.apiClient = new ApiClient({
@@ -149,7 +152,7 @@ export class ApiManager {
         return activePrediction ?? undefined;
     };
 
-    createPrediction = async(title: string, lockedAfterSeconds: number, lockedCallback?: () => void): Promise<void> => {
+    createPrediction = async(title: string, lockedAfterSeconds: number, lockedCallback?: () => void, redemptionMessageId?: string): Promise<void> => {
         const activePrediction = await this.getActivePrediction();
         if (!!activePrediction) {
             throw new Error('There is already an active prediction!');
@@ -165,9 +168,14 @@ export class ApiManager {
 
         const predictionId = prediction.id;
 
+        this._predictionInfo = {
+            id: predictionId,
+            redemptionMessageId: redemptionMessageId, 
+        };
+
         setTimeout(async() => {
             const currentActivePrediction = await this.getActivePrediction();
-            if(!!currentActivePrediction && currentActivePrediction.id === predictionId) {
+            if(currentActivePrediction?.id === predictionId) {
                 lockedCallback?.();
             }
         }, lockedAfterSeconds * 1000);
@@ -178,8 +186,17 @@ export class ApiManager {
         if (!activePrediction) {
             throw new Error('There is no active prediction!');
         }
+        if (activePrediction.status !== 'LOCKED') {
+            throw new Error(`The prediction hasn't locked yet, so it can't be resolved!`);
+        }
 
         await this.apiClient.predictions.resolvePrediction(this._broadcasterId, activePrediction.id, activePrediction.outcomes[result - 1].id);
+
+        if (activePrediction.id === this._predictionInfo?.id && !!this._predictionInfo.redemptionMessageId) {
+            this.fulfillRedemption(PREDICTION_REDEMPTION_REWARD_ID, this._predictionInfo.redemptionMessageId);
+        }
+
+        this._predictionInfo = undefined;
     };
 
     cancelPrediction = async(): Promise<void> => {
@@ -189,6 +206,12 @@ export class ApiManager {
         }
 
         await this.apiClient.predictions.cancelPrediction(this._broadcasterId, activePrediction.id);
+
+        if (activePrediction.id === this._predictionInfo?.id && !!this._predictionInfo.redemptionMessageId) {
+            this.refundRedemption(PREDICTION_REDEMPTION_REWARD_ID, this._predictionInfo.redemptionMessageId);
+        }
+
+        this._predictionInfo = undefined;
     };
 
     refundRedemption = async(rewardId: string, redemptionId: string): Promise<void> => {

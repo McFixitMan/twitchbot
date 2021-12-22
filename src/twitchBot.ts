@@ -30,13 +30,13 @@ export class TwitchBot {
     private whisperCommands: Array<BotCommand<WhisperMessage>> = [];
 
     /**
-     * Be sure to call initialize()!
+     * Be sure to call start()!
      */
     constructor() {
         // Nothing to see here
     }
 
-    initialize = async (): Promise<void> => {
+    start = async (): Promise<void> => {
         this.broadcasterAuthProvider = await createAuthProvider('broadcaster');
         this.botAuthProvider = await createAuthProvider('bot');
 
@@ -96,8 +96,8 @@ export class TwitchBot {
                 console.log(chalk.whiteBright(`[${now.toLocaleTimeString()}] ${chatMessage.msg.userInfo.displayName}: ${chatMessage.message}`));
 
                 // Check if message contains a link
-                // https://stackoverflow.com/a/42044642
-                if (!!chatMessage.message.match(/^((?:https?:\/\/)?[^./]+(?:\.[^./]+)+(?:\/.*)?)$/)) {
+                // https://stackoverflow.com/a/8218223
+                if (!!chatMessage.message.match(/((http|ftp|https):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/)) {
                     const { userInfo } = chatMessage.msg;
 
                     // Never block broadcaster

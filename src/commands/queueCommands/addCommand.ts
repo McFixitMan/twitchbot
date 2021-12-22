@@ -1,6 +1,8 @@
+import { LEVEL_CODE_REGEX, MAKER_CODE_REGEX } from './constants';
+import { Mm2LevelInfo, Mm2User } from '../../services/mm2Api';
+
 import { ChatMessage } from '../../services/chat';
 import { CommandBase } from '../base';
-import { Mm2LevelInfo } from '../../services/mm2Api';
 import { TwitchBot } from '../../twitchBot';
 
 export class AddCommand extends CommandBase<ChatMessage> {
@@ -15,7 +17,7 @@ export class AddCommand extends CommandBase<ChatMessage> {
     execute = async (chatMessage: ChatMessage): Promise<void> => {
         const { chatManager, mm2ApiManager, queueManager } = this.twitchBot;
 
-        const levelCodeMatch = chatMessage.message.match(/(([a-hj-np-yA-Z0-9]{3}-){2}[a-hj-np-yA-Z0-9]{2}[gGfFhH])/);
+        const levelCodeMatch = chatMessage.message.match(MAKER_CODE_REGEX);
     
         if (!levelCodeMatch || !levelCodeMatch[0]) {
             await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, it looks like the level you entered is invalid!`);
@@ -31,6 +33,7 @@ export class AddCommand extends CommandBase<ChatMessage> {
         const isSub = userInfo.isSubscriber;
 
         let levelInfo: Mm2LevelInfo | undefined;
+        let makerInfo: Mm2User | undefined;
 
         try {
             levelInfo = await mm2ApiManager.getLevelInfo(levelCode);
@@ -39,15 +42,30 @@ export class AddCommand extends CommandBase<ChatMessage> {
         }
 
         if (!levelInfo) {
-            await chatManager.sendMessage(`${userInfo.displayName}, the level you entered was not found! You might want to double-check that code`);
+            makerInfo = await mm2ApiManager.getUserInfo(levelCode);
+
+            if (!makerInfo) {
+                await chatManager.sendMessage(`${userInfo.displayName}, the level you entered was not found! You might want to double-check that code`);
+
+                return;
+            }
+        }
+
+        await queueManager.addQueueItemToCurrentQueue(levelCode, userInfo.displayName, isMod, isVip, isSub, !!makerInfo);
+
+        const position = await queueManager.getUserPosition(userInfo.displayName);
+
+        if (!!levelInfo) {
+            await chatManager.sendMessage(`${userInfo.displayName}, your level "${levelInfo.name}" (${levelCode}) has been added to the queue! You're in position ${position}`);
 
             return;
         }
 
-        await queueManager.addQueueItemToCurrentQueue(levelCode, userInfo.userName, isMod, isVip, isSub);
+        if (!!makerInfo) {
+            await chatManager.sendMessage(`${userInfo.displayName}, ${makerInfo.name}'s maker code (${levelCode}) has been added to the queue! You're in position ${position}`);
 
-        const position = await queueManager.getUserPosition(userInfo.userName);
-
-        await chatManager.sendMessage(`${userInfo.displayName}, your level "${levelInfo.name}" (${levelCode}) has been added to the queue! You're in position ${position}`);
+            return;
+        }
+        
     };
 }
