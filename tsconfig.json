@@ -16,14 +16,16 @@
       "sourceMap": true,
       "target": "es2017",
       "strict": true,
+      "typeRoots": [
+          "./src/types"
+      ]
   },
   "exclude": [
       "./node_modules",
       "**/*.spec.ts"
   ],
   "include": [
-      "./src/*",
-      "./build/",
-      "./types"
-, "src/database/entities"  ]
+      "src/**/*"
+  ]
+
 }

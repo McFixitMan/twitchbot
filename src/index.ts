@@ -14,9 +14,6 @@ const startServer = async(): Promise<void> => {
     const twitchBot = new TwitchBot();
 
     await twitchBot.start();
-
-    const webServer = new WebServer();
-    webServer.start();
 };
 
 startServer();

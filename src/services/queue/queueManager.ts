@@ -9,11 +9,14 @@ import { Queue } from '../../database/entities/queue';
 import { QueueItem } from '../../database/entities/queueItem';
 import { QueueRecord } from './types/queueRecord';
 import { QueueState } from '../../database/entities/queueState';
+import { SocketEvent } from '../../types/socketEvent';
+import { Server as SocketServer } from 'socket.io';
 import { getDateDifference } from '../../utility/dateHelper';
 
 export class QueueManager {
-    constructor() {
-        
+    private _socketServer: SocketServer | undefined;
+    constructor(io?: SocketServer) {
+        this._socketServer = io;
     }
     
     getBotState = async(): Promise<BotState> => {
@@ -73,6 +76,8 @@ export class QueueManager {
         await botState.save();
         await currentLevel.remove();
 
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
         return currentLevel;
     };
 
@@ -92,10 +97,12 @@ export class QueueManager {
         });
 
         if (!existingEntry) {
-            throw new Error(`${username}, you're not in the queue!`);
+            throw new Error(`${username}, is not in the queue!`);
         }
 
         await existingEntry.remove();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
 
         return existingEntry;
     };
@@ -146,7 +153,11 @@ export class QueueManager {
         queueItem.isSkip = false;
         queueItem.isMakerCode = isMakerCode;
 
-        return await queueItem.save();
+        await queueItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return queueItem;
     };
 
     replaceQueueItemInCurrentQueue = async(levelCode: string, username: string, isMod: boolean, isVip: boolean, isSub: boolean): Promise<QueueItem> => {
@@ -178,7 +189,11 @@ export class QueueManager {
         existingEntry.isVip = isVip;
         existingEntry.isSub = isSub;
 
-        return await existingEntry.save();
+        await existingEntry.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return existingEntry;
     };
 
     getUserPosition = async(username: string): Promise<number> => {
@@ -200,7 +215,7 @@ export class QueueManager {
         const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
-            throw new Error(`Don't be a dummy, you have to deal with the current level first!`);
+            throw new Error(`Resolve the current level before selecting a new one!`);
         }
     
         const progressLevelState = await LevelState.findOne({
@@ -231,14 +246,18 @@ export class QueueManager {
         nextItem.levelState = progressLevelState;
     
         await botState.save();
-        return await nextItem.save();
+        await nextItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextItem;
     };
 
     setSubNextLevel = async(): Promise<QueueItem> => {
         const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
-            throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
+            throw new Error(`Resolve the current level before selecting a new one!`);
         }
     
         const progressLevelState = await LevelState.findOne({
@@ -268,14 +287,18 @@ export class QueueManager {
         nextItem.levelState = progressLevelState;
     
         await botState.save();
-        return await nextItem.save();
+        await nextItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextItem;
     };
 
     setRandomLevel = async(): Promise<QueueItem> => {
         const botState = await this.getBotState();
 
         if (!!botState.activeQueueItem) {
-            throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
+            throw new Error(`Resolve the current level before selecting a new one!`);
         }
     
         const progressLevelState = await LevelState.findOne({
@@ -306,14 +329,18 @@ export class QueueManager {
         nextItem.levelState = progressLevelState;
     
         await botState.save();
-        return await nextItem.save();
+        await nextItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextItem;
     };
 
     setSubRandomLevel = async(): Promise<QueueItem> => {
         const botState = await this.getBotState();
     
         if (!!botState.activeQueueItem) {
-            throw new Error(`Don't be a dummy, McFixit, you have to deal with the current level first!`);
+            throw new Error(`Resolve the current level before selecting a new one!`);
         }
     
         const progressLevelState = await LevelState.findOne({
@@ -343,7 +370,11 @@ export class QueueManager {
         nextItem.levelState = progressLevelState;
     
         await botState.save();
-        return await nextItem.save();
+        await nextItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextItem;
     };
 
     setCurrentLevelAsLoss = async(): Promise<QueueItem> => {
@@ -372,6 +403,8 @@ export class QueueManager {
     
         await currentItem.save();
         await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
     
         return currentItem;
     };
@@ -402,6 +435,8 @@ export class QueueManager {
     
         await currentItem.save();
         await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
     
         return currentItem;
     };
@@ -427,7 +462,11 @@ export class QueueManager {
     
         existingEntry.isSub = true;
     
-        return await existingEntry.save();
+        await existingEntry.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return existingEntry;
     };
 
     selectUserLevel = async(username: string): Promise<QueueItem> => {
@@ -454,6 +493,7 @@ export class QueueManager {
         const levelStates = await LevelState.find();
     
         if (!!botState.activeQueueItem) {
+            // If there's a current level, set it back to 'unplayed'
             botState.activeQueueItem.levelState = levelStates.find(x => x.code === 'unplayed');
             await botState.activeQueueItem.save();
         }
@@ -464,7 +504,11 @@ export class QueueManager {
         nextEntry.levelState = levelStates.find(x => x.code === 'inprogress');
     
         await botState.save();
-        return await nextEntry.save();
+        await nextEntry.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextEntry;
     };
 
     getPlayTime = async(): Promise<string> => {
@@ -514,7 +558,11 @@ export class QueueManager {
 
         queueItem.isSkip = true;
 
-        return await queueItem.save();
+        await queueItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return queueItem;
     };
 
     createNewQueue = async(title?: string, description?: string): Promise<Queue> => {
@@ -543,6 +591,8 @@ export class QueueManager {
         botState.lastCommand = null;
 
         await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
         
         return createdQueue;
     };
@@ -563,6 +613,8 @@ export class QueueManager {
         currentQueue.queueState = queueState;
         await currentQueue.save();
     
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
         return queueState;
     };
 
@@ -573,6 +625,8 @@ export class QueueManager {
         botState.activeQueueItem = null;
         
         await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
     };
 
     loadLastQueue = async(): Promise<Queue | undefined> => {
@@ -586,6 +640,8 @@ export class QueueManager {
         botState.activeQueue = lastQueue ?? null;
 
         await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
     
         return lastQueue;
     };
@@ -641,8 +697,8 @@ export class QueueManager {
     };
 }
 
-export const createQueueManager = async (): Promise<QueueManager> => {
-    const qm = new QueueManager();
+export const createQueueManager = async (io?: SocketServer): Promise<QueueManager> => {
+    const qm = new QueueManager(io);
 
     console.info(chalk.blue(`📖 QueueManager initialized! Now accepting queue commands...`));
 

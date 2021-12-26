@@ -10,7 +10,15 @@ class QueueRoute {
     }
 
     private init = (): void => {
-        this.router.get('/getAll', queueController.getCurrentQueueItems);
+        this.router.get('/getCurrentQueueItems', queueController.getCurrentQueueItems);
+        this.router.get('/getCurrentLevel', queueController.getCurrentLevel);
+        this.router.get('/getQueueRecord', queueController.getQueueRecord);
+
+        this.router.post('/setCurrentLevel', queueController.setCurrentLevel);
+        this.router.post('/winCurrentLevel', queueController.winCurrentLevel);
+        this.router.post('/loseCurrentLevel', queueController.loseCurrentLevel);
+        this.router.post('/setNextLevel', queueController.setNextLevel);
+        this.router.post('/setRandomLevel', queueController.setRandomLevel);
     };
 }
 

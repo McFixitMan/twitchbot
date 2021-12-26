@@ -8,20 +8,23 @@ import * as morgan from 'morgan';
 import { HttpError } from './types/errors';
 import { HttpStatusCode } from './constants/httpStatusCode';
 import { Server as SocketServer } from 'socket.io';
+import { TwitchBot } from './twitchBot';
 import { getServerConfig } from './config/config';
 import { queueRoute } from './routes/queueRoute';
 
 export class WebServer {
     express: express.Application;
     io: SocketServer | undefined;
+    twitchBot: TwitchBot;
 
     private _server: http.Server | undefined;
 
     private _serverConfig;
 
-    constructor() {
-        this.express = express();
+    constructor(twitchBot: TwitchBot) {
+        this.twitchBot = twitchBot;
 
+        this.express = express();
         this._serverConfig = getServerConfig();
 
         this.configureMiddleware();
@@ -34,6 +37,13 @@ export class WebServer {
     }
 
     private configureMiddleware = (): void => {
+        this.express.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            // Attach our twitchbot instance to the response so we can use it in our controllers
+            res.twitchBot = this.twitchBot;
+
+            return next();
+        });
+
         this.express.use(compression());
         this.express.use(cors());
         this.express.use(morgan('dev'));
@@ -87,15 +97,16 @@ export class WebServer {
 
         this.io.use(async (socket, next) => {
             // Socket middleware
+            next();
         });
 
         this.io.on('connection', (socket) => {
             socket.on('disconnect', () => {
-                console.log(`SocketID ${socket.id} just DISCONNECTED`);
+                // Disconnected
             });
 
             if (socket.connected) {
-                console.log(`SocketID ${socket.id} has CONNECTED`);
+                // Connected
             }
         });
 

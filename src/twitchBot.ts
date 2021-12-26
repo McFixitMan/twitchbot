@@ -9,6 +9,7 @@ import { ApiManager } from './services/api';
 import { AuthProvider } from '@twurple/auth/lib';
 import { BotCommand } from './commands/base/botCommand';
 import { QueueManager } from './services/queue';
+import { WebServer } from './webServer';
 import { createApiManager } from './services/api/apiManager';
 import { createAuthProvider } from './services/auth';
 import { createQueueManager } from './services/queue/queueManager';
@@ -19,6 +20,7 @@ export class TwitchBot {
     mm2ApiManager!: Mm2ApiManager;
     pubSubManager!: PubSubManager;
     queueManager!: QueueManager;
+    webServer!: WebServer;
 
     private broadcasterAuthProvider: AuthProvider | undefined;
     private botAuthProvider: AuthProvider | undefined;
@@ -40,11 +42,13 @@ export class TwitchBot {
         this.broadcasterAuthProvider = await createAuthProvider('broadcaster');
         this.botAuthProvider = await createAuthProvider('bot');
 
+        await this.configureWebServer();
         await this.configureApiManager(this.broadcasterAuthProvider);
         await this.configureMm2ApiManager();
         await this.configureChatManager(this.botAuthProvider);
         await this.configurePubSub(this.broadcasterAuthProvider);
         await this.configureQueueManager();
+        
 
         console.log(' ');
         console.info(chalk.greenBright(`✅ TwitchBot is live!`));
@@ -202,8 +206,15 @@ export class TwitchBot {
     };
 
     private configureQueueManager = async (): Promise<QueueManager> => {
-        this.queueManager = await createQueueManager();
+        this.queueManager = await createQueueManager(this.webServer.io);
 
         return this.queueManager;
+    };
+
+    private configureWebServer = async (): Promise<WebServer> => {
+        this.webServer = new WebServer(this);
+        this.webServer.start();
+
+        return this.webServer;
     };
 }
