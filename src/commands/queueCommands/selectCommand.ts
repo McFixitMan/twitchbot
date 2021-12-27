@@ -28,6 +28,6 @@ export class SelectCommand extends CommandBase<ChatMessage> {
 
         const selectedItem = await queueManager.selectUserLevel(query);
 
-        await chatManager.sendMessage(`${selectedItem.username}'s level (${selectedItem.levelCode}) is now up because ${this.broadcasterName} said so!'`);
+        await chatManager.sendMessage(`${selectedItem.username}'s level (${selectedItem.levelCode}) is now up because ${this.broadcasterName} said so!`);
     };
 }
