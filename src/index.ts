@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 import { TwitchBot } from './twitchBot';
-import { WebServer } from './webServer';
 import { databaseInitializer } from './database/database';
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });

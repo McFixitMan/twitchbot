@@ -9,6 +9,7 @@ import { HttpError } from './types/errors';
 import { HttpStatusCode } from './constants/httpStatusCode';
 import { Server as SocketServer } from 'socket.io';
 import { TwitchBot } from './twitchBot';
+import { chatRoute } from './routes/chatRoute';
 import { getServerConfig } from './config/config';
 import { queueRoute } from './routes/queueRoute';
 
@@ -54,6 +55,7 @@ export class WebServer {
 
     private routes = (): void => {
         this.express.use(`${this._serverConfig.api.baseRoutePath}/queue`, queueRoute);
+        this.express.use(`${this._serverConfig.api.baseRoutePath}/chat`, chatRoute);
     };
 
     private routeNotFound = (): void => {
