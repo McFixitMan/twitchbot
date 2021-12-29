@@ -9,6 +9,8 @@ import { ApiManager } from './services/api';
 import { AuthProvider } from '@twurple/auth/lib';
 import { BotCommand } from './commands/base/botCommand';
 import { QueueManager } from './services/queue';
+import { SocketEvent } from './types/socketEvent';
+import { Server as SocketServer } from 'socket.io';
 import { WebServer } from './webServer';
 import { createApiManager } from './services/api/apiManager';
 import { createAuthProvider } from './services/auth';
@@ -43,12 +45,11 @@ export class TwitchBot {
         this.botAuthProvider = await createAuthProvider('bot');
 
         await this.configureWebServer();
+        await this.configureQueueManager(this.webServer.io);
         await this.configureApiManager(this.broadcasterAuthProvider);
         await this.configureMm2ApiManager();
-        await this.configureChatManager(this.botAuthProvider);
+        await this.configureChatManager(this.botAuthProvider, this.webServer.io);
         await this.configurePubSub(this.broadcasterAuthProvider);
-        await this.configureQueueManager();
-        
 
         console.log(' ');
         console.info(chalk.greenBright(`✅ TwitchBot is live!`));
@@ -93,11 +94,27 @@ export class TwitchBot {
         return this.mm2ApiManager;
     };
 
-    private configureChatManager = async (authProvider: AuthProvider): Promise<ChatManager> => {
-        this.chatManager = await createChatManager(authProvider, {
+    private configureChatManager = async (authProvider: AuthProvider, io?: SocketServer): Promise<ChatManager> => {
+        this.chatManager = await createChatManager(authProvider, io, {
             onMessage: async (chatMessage) => {
                 const now = new Date();
+                
                 console.log(chalk.whiteBright(`[${now.toLocaleTimeString()}] ${chatMessage.msg.userInfo.displayName}: ${chatMessage.message}`));
+                
+                this.webServer.io?.emit(SocketEvent.chatMessage, { 
+                    badges: {
+                        isBroadcaster: chatMessage.msg.userInfo.isBroadcaster,
+                        isFounder: chatMessage.msg.userInfo.isFounder,
+                        isMod: chatMessage.msg.userInfo.isMod,
+                        isSub: chatMessage.msg.userInfo.isSubscriber,
+                        isVip: chatMessage.msg.userInfo.isVip,
+                        isBot: false,
+                    },
+                    userColor: chatMessage.msg.userInfo.color ?? '#FFFFFF',
+                    username: chatMessage.msg.userInfo.displayName,
+                    message: chatMessage.message.trim(),
+                    sentAt: new Date(),
+                });
 
                 // Check if message contains a link
                 // https://stackoverflow.com/a/8218223
@@ -205,7 +222,7 @@ export class TwitchBot {
         return this.pubSubManager;
     };
 
-    private configureQueueManager = async (): Promise<QueueManager> => {
+    private configureQueueManager = async (io?: SocketServer): Promise<QueueManager> => {
         this.queueManager = await createQueueManager(this.webServer.io);
 
         return this.queueManager;

@@ -20,7 +20,7 @@ export class AddCommand extends CommandBase<ChatMessage> {
         const levelCodeMatch = chatMessage.message.match(MAKER_CODE_REGEX);
     
         if (!levelCodeMatch || !levelCodeMatch[0]) {
-            await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, it looks like the level you entered is invalid!`);
+            await chatManager.sendMessage(`The level you entered is invalid! Please use the format !add XXX-XXX-XXX`, chatMessage.msg);
         
             return;
         }
@@ -45,7 +45,7 @@ export class AddCommand extends CommandBase<ChatMessage> {
             makerInfo = await mm2ApiManager.getUserInfo(levelCode);
 
             if (!makerInfo) {
-                await chatManager.sendMessage(`${userInfo.displayName}, the level you entered was not found! You might want to double-check that code`);
+                await chatManager.sendMessage(`The level you entered was not found! You might want to double-check that code`, chatMessage.msg);
 
                 return;
             }
@@ -56,13 +56,13 @@ export class AddCommand extends CommandBase<ChatMessage> {
         const position = await queueManager.getUserPosition(userInfo.displayName);
 
         if (!!levelInfo) {
-            await chatManager.sendMessage(`${userInfo.displayName}, your level "${levelInfo.name}" (${levelCode}) has been added to the queue! You're in position ${position}`);
+            await chatManager.sendMessage(`Your level "${levelInfo.name}" (${levelCode}) has been added to the queue! You're in position ${position}`, chatMessage.msg);
 
             return;
         }
 
         if (!!makerInfo) {
-            await chatManager.sendMessage(`${userInfo.displayName}, ${makerInfo.name}'s maker code (${levelCode}) has been added to the queue! You're in position ${position}`);
+            await chatManager.sendMessage(`${makerInfo.name}'s maker code (${levelCode}) has been added to the queue! You're in position ${position}`, chatMessage.msg);
 
             return;
         }

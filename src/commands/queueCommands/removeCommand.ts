@@ -24,41 +24,5 @@ export class RemoveCommand extends CommandBase<ChatMessage> {
         const removedLevel = await queueManager.removeCurrentLevel();
 
         await chatManager.sendMessage(`${removedLevel.username}, your level ${removedLevel.levelCode} has been removed from the queue... ᴵ ˢᵘˢᵖᵉᶜᵗ ᵃᵇˢᵉⁿᵗᵉᵉᶦˢᵐ`);
-
-        const lastCommand = await queueManager.getLastCommand();
-
-        switch (lastCommand) {
-            case LEVEL_COMMAND.next: {
-                const nextItem = await queueManager.setNextLevel();
-
-                await chatManager.sendMessage(`Alright, let's do another next. $${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
-
-                break;
-            }
-            case LEVEL_COMMAND.random: {
-                const nextItem = await queueManager.setRandomLevel();
-
-                await chatManager.sendMessage(`I guess we're still on random... ${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
-
-                break;
-            }
-            case LEVEL_COMMAND.subnext: {
-                const nextItem = await queueManager.setSubNextLevel();
-
-                await chatManager.sendMessage(`We're on subnext? Well who's the next subnext... ${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
-
-                break;
-            }
-            case LEVEL_COMMAND.subrandom: {
-                const nextItem = await queueManager.setSubRandomLevel();
-
-                await chatManager.sendMessage(`Another subrandom it is! ${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
-
-                break;
-            }
-            default: {
-                return;
-            }
-        }
     };
 }

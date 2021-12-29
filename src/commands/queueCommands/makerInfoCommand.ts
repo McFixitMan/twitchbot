@@ -21,7 +21,7 @@ export class MakerInfoCommand extends CommandBase<ChatMessage> {
         const makerCodeMatch = chatMessage.message.match(MAKER_CODE_REGEX);
 
         if (!makerCodeMatch || !makerCodeMatch[0]) {
-            await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, invalid maker code!`);
+            await chatManager.sendMessage(`Invalid maker code!`, chatMessage.message);
 
             return;
         }
@@ -36,6 +36,6 @@ export class MakerInfoCommand extends CommandBase<ChatMessage> {
             return;
         }
 
-        await chatManager.sendMessage(`${userInfo.displayName}: That's ${makerInfo.name}. They're from the ${makerInfo.region_name} region (${makerInfo.country}) and they've made ${makerInfo.uploaded_levels} levels, giving them a whopping ${makerInfo.likes} likes and ${makerInfo.maker_points} maker points!`);
+        await chatManager.sendMessage(`That's ${makerInfo.name}. They're from the ${makerInfo.region_name} region (${makerInfo.country}) and they've made ${makerInfo.uploaded_levels} levels, giving them a whopping ${makerInfo.likes} likes and ${makerInfo.maker_points} maker points!`, chatMessage.msg);
     };
 }

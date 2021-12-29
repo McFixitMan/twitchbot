@@ -24,6 +24,6 @@ export class LossCommand extends CommandBase<ChatMessage> {
 
         const completedLevel = await queueManager.setCurrentLevelAsLoss();
 
-        await chatManager.sendMessage(`${completedLevel.username}, ${this.broadcasterName} couldn't beat your level and he's really sorry about that.`);
+        await chatManager.sendMessage(`${completedLevel.username}, ${this.broadcasterName} couldn't beat your level and they're really sorry about that.`);
     };
 }

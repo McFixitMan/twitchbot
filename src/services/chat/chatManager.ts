@@ -3,6 +3,8 @@ import * as chalk from 'chalk';
 import { AuthProvider } from '@twurple/auth/lib';
 import { ChatClient } from '@twurple/chat';
 import { Listener } from '@d-fischer/typed-event-emitter/lib';
+import { SocketEvent } from '../../types/socketEvent';
+import { Server as SocketServer } from 'socket.io';
 import { TwitchPrivateMessage } from '@twurple/chat/lib/commands/TwitchPrivateMessage';
 import { getBotConfig } from '../../config';
 
@@ -26,8 +28,11 @@ export class ChatManager {
     private _channelName: string = getBotConfig().broadcaster.username;
     private _props: ChatManagerProps = {};
     private _permits: Array<string> = [];
+    private _socketServer: SocketServer | undefined;
 
-    constructor(authProvider: AuthProvider) {
+    constructor(authProvider: AuthProvider, io?: SocketServer) {
+        this._socketServer = io;
+
         this.chatClient = new ChatClient({ 
             authProvider: authProvider,
             channels: [
@@ -49,9 +54,30 @@ export class ChatManager {
         await this.cleanup();
     };
 
-    sendMessage = async (message: string): Promise<void> => {
+    sendMessage = async (message: string, replyTo?: string | TwitchPrivateMessage): Promise<void> => {
         const now = new Date();
-        await this.chatClient.say(this._channelName, message);
+        
+        this._socketServer?.emit(SocketEvent.chatMessage, { 
+            badges: {
+                isBroadcaster: false,
+                isFounder: false,
+                isMod: true,
+                isSub: false,
+                isVip: false,
+                isBot: true,
+            },
+            userColor: '#eb4034',
+            username: '[BOT]',
+            message: message,
+            sentAt: new Date(),
+        });
+
+        await this.chatClient.say(this._channelName, message, {
+            replyTo: replyTo,
+        });
+        // await this.chatClient.say(this._channelName, message);
+        
+        
         console.log(chalk.yellowBright(`[${now.toLocaleTimeString()}] [BOT]: ${message}`));
     };
 
@@ -124,12 +150,12 @@ export class ChatManager {
     };
 }
 
-export const createChatManager = async (authProvider: AuthProvider, props?: ChatManagerProps): Promise<ChatManager> => {
+export const createChatManager = async (authProvider: AuthProvider, io?: SocketServer, props?: ChatManagerProps): Promise<ChatManager> => {
     if (!authProvider) {
         throw new Error('Auth provider must be initialized before creating chatManager');
     }
 
-    const chatManager = new ChatManager(authProvider);
+    const chatManager = new ChatManager(authProvider, io);
     await chatManager.initialize(props);
 
     console.info(chalk.blue(`💬 ChatManager initialized! Now listening to chat messages...`));

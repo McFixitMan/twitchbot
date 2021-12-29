@@ -18,6 +18,6 @@ export class LeaveCommand extends CommandBase<ChatMessage> {
 
         const removed = await queueManager.removeUserFromQueue(userInfo.userName);
 
-        await chatManager.sendMessage(`${userInfo.displayName}, your level ${removed?.levelCode} has been removed from the queue!`);
+        await chatManager.sendMessage(`Your level ${removed?.levelCode} has been removed from the queue!`, chatMessage.msg);
     };
 }

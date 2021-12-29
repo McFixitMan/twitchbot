@@ -64,6 +64,10 @@ export class QueueManager {
         return botState.activeQueueItem ?? undefined;
     };
 
+    /**
+     * Remove the current QueueItem from the Queue entirely
+     * @returns The removed QueueItem
+     */
     removeCurrentLevel = async(): Promise<QueueItem> => {
         const botState = await this.getBotState();
 
@@ -79,6 +83,69 @@ export class QueueManager {
         this._socketServer?.emit(SocketEvent.queueChanged);
 
         return currentLevel;
+    };
+
+    /**
+     * Remove the current QueueItem from bot state and return the QueueItem to its original position
+     * @returns The unselected QueueItem
+     */
+    unselectCurrentLevel = async(): Promise<QueueItem> => {
+        const botState = await this.getBotState();
+
+        const levelStates = await LevelState.find();
+
+        if (!botState.activeQueueItem) {
+            // No current level, nothing to requeue
+            throw new Error('There is no current level');
+        }
+
+        botState.activeQueueItem.levelState = levelStates.find(x => x.code === 'unplayed');
+        await botState.activeQueueItem.save();
+
+        const removedLevel = {
+            ...botState.activeQueueItem,
+        } as QueueItem;
+
+        botState.activeQueueItem = null;
+        botState.startedAt = null;
+
+        await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return removedLevel;
+    };
+
+    /**
+     * Remove the current QueueItem from bot state and move the QueueItem to the end of the Queue
+     * @returns The re-queued QueueItem
+     */
+    reQueueCurrentLevel = async(): Promise<QueueItem> => {
+        const botState = await this.getBotState();
+
+        const levelStates = await LevelState.find();
+
+        if (!botState.activeQueueItem) {
+            // No current level, nothing to requeue
+            throw new Error('There is no current level');
+        }
+
+        botState.activeQueueItem.levelState = levelStates.find(x => x.code === 'unplayed');
+        botState.activeQueueItem.createdAt = new Date();
+        await botState.activeQueueItem.save();
+
+        const removedLevel = {
+            ...botState.activeQueueItem,
+        } as QueueItem;
+
+        botState.activeQueueItem = null;
+        botState.startedAt = null;
+
+        await botState.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return removedLevel;
     };
 
     removeUserFromQueue = async(username: string): Promise<QueueItem> => {
@@ -196,7 +263,7 @@ export class QueueManager {
         return existingEntry;
     };
 
-    getUserPosition = async(username: string): Promise<number> => {
+    getUserPosition = async(username: string): Promise<number | undefined> => {
         const list = await this.getCurrentQueueItems();
 
         if (!list) {
@@ -207,7 +274,7 @@ export class QueueManager {
         if (index > -1) {
             return index + 1;
         } else {
-            throw new Error(`${username}, you're not in the queue!`);
+            return undefined;
         }
     };
 

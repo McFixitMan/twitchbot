@@ -135,7 +135,7 @@ export class WebServer {
         }
 
         server.listen(this._serverConfig.api.port, () => {
-            console.log(chalk.greenBright(`🖥️ Running WebServer on port ${this._serverConfig.api.port}`));
+            console.log(chalk.blue(`🖥️ Running WebServer on port ${this._serverConfig.api.port}`));
         });
     };
 }

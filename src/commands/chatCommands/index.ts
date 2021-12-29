@@ -11,6 +11,7 @@ import { GameInfoCommand } from './gameInfoCommand';
 import { ModsCommand } from './modsCommand';
 import { PermitCommand } from './permitCommand';
 import { ResolvePredictionCommand } from './resolvePredictionCommand';
+import { RunAdCommand } from './runAdCommand';
 import { ShoutoutCommand } from './shoutoutCommand';
 import { StreamersCommand } from './streamersCommand';
 import { SubsCommand } from './subsCommand';
@@ -29,6 +30,7 @@ const commandList: CommandList<ChatMessage> = [
     ModsCommand,
     PermitCommand,
     ResolvePredictionCommand,
+    RunAdCommand,
     ShoutoutCommand,
     StreamersCommand,
     SubsCommand,

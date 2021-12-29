@@ -16,8 +16,12 @@ export class PositionCommand extends CommandBase<ChatMessage> {
 
         const { userInfo } = chatMessage.msg;
 
-        const position = await queueManager.getUserPosition(userInfo.userName);
+        const position = await queueManager.getUserPosition(userInfo.displayName);
 
-        await chatManager.sendMessage(`${userInfo.displayName}, you're in position ${position}`);
+        if (!position) {
+            await chatManager.sendMessage(`You're not in the queue!`, chatMessage.msg);
+        } else {
+            await chatManager.sendMessage(`You're in position ${position}`, chatMessage.msg);
+        }
     };
 }

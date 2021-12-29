@@ -30,7 +30,7 @@ export class LevelInfoCommand extends CommandBase<ChatMessage> {
         const levelInfo = await mm2ApiManager.getLevelInfo(levelCode);
 
         if (!levelInfo) {
-            await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, the level wasn't found!`);
+            await chatManager.sendMessage(`The level wasn't found!`, chatMessage.msg);
 
             return;
         }
@@ -59,6 +59,6 @@ export class LevelInfoCommand extends CommandBase<ChatMessage> {
 
         stupidThingsToSay.push(`The like/boo ratio is ${likeRatio} (${levelInfo.likes} ❤️ ${levelInfo.boos} 💙)`);
 
-        await chatManager.sendMessage(`${userInfo.displayName}: That level is "${levelInfo.name}" (${levelCode}) by ${levelInfo.uploader.name}, uploaded ${levelInfo.uploaded_pretty}. ${stupidThingsToSay.join(' ')}`);
+        await chatManager.sendMessage(`That level is "${levelInfo.name}" (${levelCode}) by ${levelInfo.uploader.name}, uploaded ${levelInfo.uploaded_pretty}. ${stupidThingsToSay.join(' ')}`, chatMessage.msg);
     };
 }
