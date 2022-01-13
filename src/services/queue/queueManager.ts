@@ -1,9 +1,9 @@
 import * as chalk from 'chalk';
 
+import { In, Not } from 'typeorm';
 import { LEVEL_COMMAND, LEVEL_STATE, QUEUE_STATE } from './enums';
 
 import { BotState } from '../../database/entities/botState';
-import { In } from 'typeorm';
 import { LevelState } from '../../database/entities/levelState';
 import { Queue } from '../../database/entities/queue';
 import { QueueItem } from '../../database/entities/queueItem';
@@ -12,6 +12,7 @@ import { QueueState } from '../../database/entities/queueState';
 import { SocketEvent } from '../../types/socketEvent';
 import { Server as SocketServer } from 'socket.io';
 import { getDateDifference } from '../../utility/dateHelper';
+import { getWeightedRandomIndex } from '../../utility/randomHelper';
 
 export class QueueManager {
     private _socketServer: SocketServer | undefined;
@@ -403,6 +404,59 @@ export class QueueManager {
         return nextItem;
     };
 
+    setWeightedRandomLevel = async(): Promise<QueueItem> => {
+        const botState = await this.getBotState();
+
+        if (!!botState.activeQueueItem) {
+            throw new Error(`Resolve the current level before selecting a new one!`);
+        }
+    
+        const progressLevelState = await LevelState.findOne({
+            where: {
+                code: 'inprogress',
+            },
+        });
+    
+        if (!progressLevelState) {
+            throw new Error('Couldnt find the right level state... blame the dev for this travesty');
+        }
+    
+        botState.lastCommand = LEVEL_COMMAND.random;
+        await botState.save();
+    
+        const list = await this.getCurrentQueueItems();
+    
+        if (!list || list.length === 0) {
+            throw new Error('There are no levels in the queue!');
+        }
+
+        const now = new Date();
+
+        const dateDiffs: Array<number> = [];
+
+        // Our 'weights' will just be the total time between when each level was added and now
+        for (let i = 0; i < list.length; i++) {
+            dateDiffs.push(now.getTime() - list[i].createdAt.getTime());
+        }
+    
+        // Get the index for the result of our weighted random
+        const nextItemIndex = getWeightedRandomIndex(dateDiffs);
+
+        const nextItem = list[nextItemIndex];
+        
+        botState.activeQueueItem = nextItem;
+        botState.startedAt = new Date();
+    
+        nextItem.levelState = progressLevelState;
+    
+        await botState.save();
+        await nextItem.save();
+
+        this._socketServer?.emit(SocketEvent.queueChanged);
+
+        return nextItem;
+    };
+
     setSubRandomLevel = async(): Promise<QueueItem> => {
         const botState = await this.getBotState();
     
@@ -698,11 +752,15 @@ export class QueueManager {
 
     loadLastQueue = async(): Promise<Queue | undefined> => {
         const botState = await this.getBotState();
-    
-        const lastQueue = await Queue.createQueryBuilder('queue')
-            .select('queue')
-            .orderBy('queue.createdAt', 'DESC')
-            .getOne();
+
+        const lastQueue = await Queue.findOne({
+            where: {
+                id: Not(botState.activeQueue?.id),
+            },
+            order: {
+                createdAt: 'DESC',
+            },
+        });
     
         botState.activeQueue = lastQueue ?? null;
 

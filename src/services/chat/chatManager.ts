@@ -2,10 +2,13 @@ import * as chalk from 'chalk';
 
 import { AuthProvider } from '@twurple/auth/lib';
 import { ChatClient } from '@twurple/chat';
+import { Chatter } from './types/chatter';
+import { ChatterResponse } from './types/chatterResponse';
 import { Listener } from '@d-fischer/typed-event-emitter/lib';
 import { SocketEvent } from '../../types/socketEvent';
 import { Server as SocketServer } from 'socket.io';
 import { TwitchPrivateMessage } from '@twurple/chat/lib/commands/TwitchPrivateMessage';
+import axios from 'axios';
 import { getBotConfig } from '../../config';
 
 export type ChatListenerType = 'message';
@@ -119,6 +122,70 @@ export class ChatManager {
         const found = this._permits.find(user => user === username);
 
         return !!found;
+    };
+
+    enableEmoteOnlyMode = async (): Promise<void> => {
+        await this.chatClient.enableEmoteOnly(this._channelName);
+    };
+
+    disableEmoteOnlyMode = async (): Promise<void> => {
+        await this.chatClient.disableEmoteOnly(this._channelName);
+    };
+
+    getChatters = async (): Promise<Array<Chatter>> => {
+        // Unlisted api endpoint to get the list of chatters
+        // See: https://discuss.dev.twitch.tv/t/how-can-i-get-chat-list-in-a-channel-by-api/12225
+
+
+        // Lowercase appears to be required
+        const { data }  = await axios.get<ChatterResponse>(`https://tmi.twitch.tv/group/user/${this._channelName.toLowerCase()}/chatters`);
+
+        const { chatters } = data;
+
+        const all = chatters.admins.map(x => { 
+            const c: Chatter = {
+                username: x,
+                isAdmin: true,
+            };
+            
+            return c;
+        }).concat(chatters.global_mods.map(x => {
+            const c: Chatter = {
+                username: x,
+                isGlobalMod: true,
+            };
+
+            return c;
+        })).concat(chatters.moderators.map(x => {
+            const c: Chatter = {
+                username: x,
+                isMod: true,
+            };
+
+            return c;
+        })).concat(chatters.staff.map(x => {
+            const c: Chatter = {
+                username: x,
+                isStaff: true,
+            };
+
+            return c;
+        })).concat(chatters.viewers.map(x => {
+            const c: Chatter = {
+                username: x,
+            };
+
+            return c;
+        })).concat(chatters.vips.map(x => {
+            const c: Chatter = {
+                username: x,
+                isVip: true,
+            };
+
+            return c;
+        }));
+            
+        return all;
     };
 
     private configureListeners = async (): Promise<void> => {

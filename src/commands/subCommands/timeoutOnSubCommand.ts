@@ -19,8 +19,13 @@ export class TimeoutOnSubCommand extends CommandBase<SubMessage> {
             await chatManager.sendMessage(`${subMessage.userName} has been timed out for 60 seconds for receiving a sub :)`);
 
             if (subMessage.isAnonymous) {
-                await chatManager.runCommercial(30);
-                await chatManager.sendMessage(`An anonymous gifter thought they were clever, but now everyone gets a 30 second ad :)`);
+                await chatManager.enableEmoteOnlyMode();
+                await chatManager.sendMessage(`An anonymous gifter thought they were clever, so now we're in emote-only mode for 2 minutes`);
+
+                setTimeout(async () => {
+                    await chatManager.disableEmoteOnlyMode();
+                    await chatManager.sendMessage(`Emote-only mode has been disabled`);
+                }, 1000 * 60 * 2);
 
             } else if (!!subMessage.gifterName) {
                 await chatManager.timeoutUser(subMessage.gifterName, 300);

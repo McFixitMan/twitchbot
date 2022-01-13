@@ -10,7 +10,10 @@ class ChatRoute {
     }
 
     private init = (): void => {
+        this.router.get('/getChatters', chatController.getChatters);
+        
         this.router.post('/sendChatMessage', chatController.sendChatMessage);
+
     };
 }
 

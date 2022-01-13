@@ -11,7 +11,7 @@ import { BotCommand } from './commands/base/botCommand';
 import { QueueManager } from './services/queue';
 import { SocketEvent } from './types/socketEvent';
 import { Server as SocketServer } from 'socket.io';
-import { WebServer } from './webServer';
+import { WebServer } from './services/webServer';
 import { createApiManager } from './services/api/apiManager';
 import { createAuthProvider } from './services/auth';
 import { createQueueManager } from './services/queue/queueManager';

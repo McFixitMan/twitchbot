@@ -6,6 +6,7 @@ import { CommandList } from '../base';
 import { CreatePredictionCommand } from './createPredictionCommand';
 import { CreateRewardCommand } from './createRewardCommand';
 import { DelayCommand } from './delayCommand';
+import { EmoteOnlyCommand } from './emoteOnlyCommand';
 import { FollowageCommand } from './followageCommand';
 import { GameInfoCommand } from './gameInfoCommand';
 import { ModsCommand } from './modsCommand';
@@ -25,6 +26,7 @@ const commandList: CommandList<ChatMessage> = [
     CreatePredictionCommand,
     CreateRewardCommand,
     DelayCommand,
+    EmoteOnlyCommand,
     FollowageCommand,
     GameInfoCommand,
     ModsCommand,

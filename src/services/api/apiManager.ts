@@ -276,6 +276,12 @@ export class ApiManager {
         
         return channelInfo?.gameName;
     };
+
+    getNumberOfViewers = async (): Promise<number> => {
+        const stream = await this.apiClient.streams.getStreamByUserId(this._broadcasterId);
+                
+        return stream?.viewers ?? 0;
+    };
 }
 
 export const createApiManager = async (authProvider: AuthProvider, props?: ApiManagerProps): Promise<ApiManager> => {

@@ -15,8 +15,14 @@ export class TimeoutOnBitsCommand extends CommandBase<BitMessage> {
         const { chatManager } = this.twitchBot;
 
         if (bitMessage.isAnonymous) {
-            await chatManager.runCommercial(30);
-            await chatManager.sendMessage(`An anonymous gifter thought they were clever, but now everyone gets a 30 second ad :)`);
+            await chatManager.enableEmoteOnlyMode();
+            await chatManager.sendMessage(`An anonymous cheerer thought they were clever, so now we're in emote-only mode for 2 minutes`);
+
+            setTimeout(async () => {
+                await chatManager.disableEmoteOnlyMode();
+                await chatManager.sendMessage(`Emote-only mode has been disabled`);
+            }, 1000 * 60 * 2);
+            
         } else if (!!bitMessage.userName) {
             await chatManager.timeoutUser(bitMessage.userName, bitMessage.bits, 'Cheering');
             await chatManager.sendMessage(`${bitMessage.userName} has been timed out for ${bitMessage.bits} seconds for cheering ${bitMessage.bits} bits. Get rekt.`);
