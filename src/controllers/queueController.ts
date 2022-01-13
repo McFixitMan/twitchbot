@@ -134,7 +134,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setWeightedRandomLevel();
 
-            chatManager.sendMessage(`[W-RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendMessage(`[WEIGHTED-RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
 
             return res
                 .status(HttpStatusCode.OK)
