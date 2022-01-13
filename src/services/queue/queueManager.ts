@@ -432,15 +432,11 @@ export class QueueManager {
 
         const now = new Date();
 
-        const dateDiffs: Array<number> = [];
-
         // Our 'weights' will just be the total time between when each level was added and now
-        for (let i = 0; i < list.length; i++) {
-            dateDiffs.push(now.getTime() - list[i].createdAt.getTime());
-        }
-    
+        const dateWeights = list.map((item) => now.getTime() - item.createdAt.getTime());
+        
         // Get the index for the result of our weighted random
-        const nextItemIndex = getWeightedRandomIndex(dateDiffs);
+        const nextItemIndex = getWeightedRandomIndex(dateWeights);
 
         const nextItem = list[nextItemIndex];
         
