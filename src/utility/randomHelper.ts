@@ -10,7 +10,7 @@
 export const getWeightedRandomIndex = (weights: Array<number>): number => {
     let random: number;
 
-    const totalWeight = weights.reduce((partialSum, a) => partialSum + a, 0);
+    const totalWeight = weights.reduce((partialSum, weight) => partialSum + weight, 0);
 
     random = Math.random() * totalWeight;
 
