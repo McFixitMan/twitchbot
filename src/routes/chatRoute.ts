@@ -14,6 +14,7 @@ class ChatRoute {
         
         this.router.post('/sendChatMessage', chatController.sendChatMessage);
 
+        this.router.post('/permitLink', chatController.permitLink);
     };
 }
 

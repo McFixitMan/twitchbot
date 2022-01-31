@@ -33,6 +33,26 @@ class ChatController {
             return next(err);
         }
     };
+
+    permitLink = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+        const { chatManager } = res.twitchBot;
+
+        const username = req.body.username;
+
+        if (!username) {
+            return res
+                .status(HttpStatusCode.BAD_REQUEST)
+                .send({ message: 'Username is required' });
+        }
+
+        try {
+            await chatManager.permitLink(username);
+
+            await chatManager.sendMessage(`${username}, you have been permitted to send a link within 60 seconds!`);
+        } catch (err) {
+            return next(err);
+        }
+    };
 }
 
 const chatController = new ChatController();

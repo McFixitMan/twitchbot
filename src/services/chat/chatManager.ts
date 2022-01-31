@@ -98,6 +98,10 @@ export class ChatManager {
     };
 
     permitLink = async (username: string): Promise<void> => {
+        if (await this.isUserPermitted(username)) {
+            throw new Error(`${username} already has a permit in progress`);
+        }
+        
         this._permits.push(username);
 
         setTimeout(() => {
