@@ -20,7 +20,7 @@ export class ReplaceCommand extends CommandBase<ChatMessage> {
         const levelCodeMatch = chatMessage.message.match(MAKER_CODE_REGEX);
     
         if (!levelCodeMatch || !levelCodeMatch[0]) {
-            await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, it looks like the level you entered is invalid!`);
+            await chatManager.sendMessage(`${chatMessage.msg.userInfo.displayName}, it looks like the level you entered is invalid!`, chatMessage.msg);
         
             return;
         }
@@ -42,12 +42,10 @@ export class ReplaceCommand extends CommandBase<ChatMessage> {
         }
 
         if (!levelInfo) {
-            makerInfo = await mm2ApiManager.getUserInfo(levelCode);
-
-            if (!makerInfo) {
-                await chatManager.sendMessage(`${userInfo.displayName}, the level you entered was not found! You might want to double-check that code`);
-
-                return;
+            try {
+                makerInfo = await mm2ApiManager.getUserInfo(levelCode);
+            } catch (err) {
+                // ignored
             }
         }
 
@@ -56,14 +54,20 @@ export class ReplaceCommand extends CommandBase<ChatMessage> {
         const position = await queueManager.getUserPosition(userInfo.displayName);
 
         if (!!levelInfo) {
-            await chatManager.sendMessage(`${userInfo.displayName}, you updated your level to "${levelInfo.name}" (${levelCode}) :) You're still in position ${position}`);
+            await chatManager.sendMessage(`You updated your level to "${levelInfo.name}" (${levelCode}) :) You're still in position ${position}`, chatMessage.msg);
 
             return;
         }
 
         if (!!makerInfo) {
-            await chatManager.sendMessage(`${userInfo.displayName}, you updated your level to ${makerInfo.name}'s maker code (${levelCode}) :) You're still in position ${position}`);
+            await chatManager.sendMessage(`You updated your level to ${makerInfo.name}'s maker code (${levelCode}) :) You're still in position ${position}`, chatMessage.msg);
 
+            return;
+        }
+
+        if (!levelInfo && !makerInfo) {
+            await chatManager.sendMessage(`You updated your level to ${levelCode}, and you're still in position ${position}. I wasn't able to find level info for your entry, so there is either a problem with the API, or the level you entered was not found. Double check your code and use the !replace command if necessary`, chatMessage.msg);
+        
             return;
         }
     };
