@@ -42,12 +42,10 @@ export class AddCommand extends CommandBase<ChatMessage> {
         }
 
         if (!levelInfo) {
-            makerInfo = await mm2ApiManager.getUserInfo(levelCode);
-
-            if (!makerInfo) {
-                await chatManager.sendMessage(`The level you entered was not found! You might want to double-check that code`, chatMessage.msg);
-
-                return;
+            try {
+                makerInfo = await mm2ApiManager.getUserInfo(levelCode);
+            } catch (err) {
+                // ignored
             }
         }
 
@@ -65,6 +63,10 @@ export class AddCommand extends CommandBase<ChatMessage> {
             await chatManager.sendMessage(`${makerInfo.name}'s maker code (${levelCode}) has been added to the queue! You're in position ${position}`, chatMessage.msg);
 
             return;
+        }
+
+        if (!levelInfo && !makerInfo) {
+            await chatManager.sendMessage(`Your level ${levelCode} has been added to the queue! You're in position ${position}. I wasn't able to find level info for your entry, so there is either a problem with the API, or the level you entered was not found. Double check your code and use the !replace command if necessary`, chatMessage.msg);
         }
         
     };

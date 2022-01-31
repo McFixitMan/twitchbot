@@ -774,22 +774,6 @@ export class QueueManager {
             throw new Error('There is no active queue!');
         }
     
-        const winState = await LevelState.findOne({
-            where: {
-                code: 'win',
-            },
-        });
-    
-        const lossState = await LevelState.findOne({
-            where: {
-                code: 'loss',
-            },
-        });
-    
-        if (!winState || !lossState) {
-            throw new Error('Unable to find the states to determine record. McFixit sucks at programming');
-        }
-    
         const queueItems = await QueueItem.find({
             where: {
                 queue: botState.activeQueue,
@@ -797,12 +781,8 @@ export class QueueManager {
             },
         });
     
-        if (!queueItems || queueItems.length === 0) {
-            throw new Error('There are no completed levels in the queue!');
-        }
-    
-        const wins = queueItems.filter((x) => x.levelState?.id === winState.id).length;
-        const losses = queueItems.filter((x) => x.levelState?.id === lossState.id).length;
+        const wins = queueItems.filter((x) => x.levelState?.id === LEVEL_STATE.win).length;
+        const losses = queueItems.filter((x) => x.levelState?.id === LEVEL_STATE.loss).length;
     
         return {
             queue: botState.activeQueue,
