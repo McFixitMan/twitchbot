@@ -11,6 +11,7 @@ import { Server as SocketServer } from 'socket.io';
 import { TwitchBot } from '../../twitchBot';
 import { chatRoute } from '../../routes/chatRoute';
 import { getServerConfig } from '../../config/config';
+import { predictionRoute } from '../../routes/predictionRoute';
 import { queueRoute } from '../../routes/queueRoute';
 
 export class WebServer {
@@ -56,6 +57,7 @@ export class WebServer {
     private routes = (): void => {
         this.express.use(`${this._serverConfig.api.baseRoutePath}/queue`, queueRoute);
         this.express.use(`${this._serverConfig.api.baseRoutePath}/chat`, chatRoute);
+        this.express.use(`${this._serverConfig.api.baseRoutePath}/prediction`, predictionRoute);
     };
 
     private routeNotFound = (): void => {

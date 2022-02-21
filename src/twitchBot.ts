@@ -45,8 +45,8 @@ export class TwitchBot {
         this.botAuthProvider = await createAuthProvider('bot');
 
         await this.configureWebServer();
-        await this.configureQueueManager(this.webServer.io);
-        await this.configureApiManager(this.broadcasterAuthProvider);
+        await this.configureQueueManager();
+        await this.configureApiManager(this.broadcasterAuthProvider, this.webServer.io);
         await this.configureMm2ApiManager();
         await this.configureChatManager(this.botAuthProvider, this.webServer.io);
         await this.configurePubSub(this.broadcasterAuthProvider);
@@ -80,8 +80,8 @@ export class TwitchBot {
         });
     };
 
-    private configureApiManager = async (authProvider: AuthProvider): Promise<ApiManager> => {
-        this.apiManager = await createApiManager(authProvider);
+    private configureApiManager = async (authProvider: AuthProvider, io?: SocketServer): Promise<ApiManager> => {
+        this.apiManager = await createApiManager(authProvider, io);
 
         await this.apiManager.initialize();
 
@@ -222,7 +222,7 @@ export class TwitchBot {
         return this.pubSubManager;
     };
 
-    private configureQueueManager = async (io?: SocketServer): Promise<QueueManager> => {
+    private configureQueueManager = async (): Promise<QueueManager> => {
         this.queueManager = await createQueueManager(this.webServer.io);
 
         return this.queueManager;

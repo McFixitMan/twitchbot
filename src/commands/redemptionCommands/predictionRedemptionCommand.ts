@@ -26,13 +26,33 @@ export class PredictionRedemptionCommand extends CommandBase<RedemptionMessage> 
         } else {
             const voteDuration = 120;
 
-            await apiManager.createPrediction(redemptionMessage.message, voteDuration, async() => {
-                await chatManager.sendMessage(`${redemptionMessage.userDisplayName}, your prediction is officially live!`);
+            try {
+                await apiManager.createPrediction(redemptionMessage.message, voteDuration, async() => {
+                    await chatManager.sendMessage(`${redemptionMessage.userDisplayName}, your prediction is officially live!`);
+    
+                    await apiManager.fulfillRedemption(PREDICTION_REDEMPTION_REWARD_ID, redemptionMessage.id);
+                }, redemptionMessage.id);
 
-                await apiManager.fulfillRedemption(PREDICTION_REDEMPTION_REWARD_ID, redemptionMessage.id);
-            }, redemptionMessage.id);
+                await chatManager.sendMessage(`${this.broadcasterName}, you have ${voteDuration} seconds to go grab a drink... Everyone else get your votes in!`);
+            } catch (err) {
+                // TODO: This is gross, find a better way to access this
+                const error = err as { body: string };
 
-            await chatManager.sendMessage(`${this.broadcasterName}, you have ${voteDuration} seconds to go grab a drink... Everyone else get your votes in!`);
+                const body = JSON.parse(error.body) as { message: string };
+
+                await apiManager.refundRedemption(PREDICTION_REDEMPTION_REWARD_ID, redemptionMessage.id);
+
+                if (!!body && !!body.message) {
+                    await chatManager.sendMessage(`${redemptionMessage.userDisplayName}, there was an error creating the prediction, your points will be refunded: ${body.message}`);
+                } else {
+                    await chatManager.sendMessage(`${redemptionMessage.userDisplayName}, there was an error creating the prediction, your points will be refunded.`);
+                }
+                
+                
+            }
+            
+
+            
         }
     };
 }

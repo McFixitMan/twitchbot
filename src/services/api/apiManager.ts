@@ -4,12 +4,10 @@ import { ApiClient, HelixPrediction, HelixUser } from '@twurple/api';
 
 import { AuthProvider } from '@twurple/auth/lib';
 import { PREDICTION_REDEMPTION_REWARD_ID } from '../../constants/redemptions';
+import { SocketEvent } from '../../types/socketEvent';
+import { Server as SocketServer } from 'socket.io';
 import { getBotConfig } from '../../config';
 import { getDateDifference } from '../../utility/dateHelper';
-
-interface ApiManagerProps {
-
-}
 
 export class ApiManager {
     public apiClient: ApiClient;
@@ -19,10 +17,14 @@ export class ApiManager {
 
     private _predictionInfo?: { id: string; redemptionMessageId?: string; } = undefined;
 
-    constructor(authProvider: AuthProvider) {
+    private _socketServer: SocketServer | undefined;
+
+    constructor(authProvider: AuthProvider, io?: SocketServer) {
         this.apiClient = new ApiClient({
             authProvider: authProvider,
         });
+
+        this._socketServer = io;
     }
 
     initialize = async (): Promise<void> => {
@@ -173,6 +175,8 @@ export class ApiManager {
             redemptionMessageId: redemptionMessageId, 
         };
 
+        this._socketServer?.emit(SocketEvent.predictionStarted);
+
         setTimeout(async() => {
             const currentActivePrediction = await this.getActivePrediction();
             if(currentActivePrediction?.id === predictionId) {
@@ -192,6 +196,8 @@ export class ApiManager {
 
         await this.apiClient.predictions.resolvePrediction(this._broadcasterId, activePrediction.id, activePrediction.outcomes[result - 1].id);
 
+        this._socketServer?.emit(SocketEvent.predictionEnded);
+
         if (activePrediction.id === this._predictionInfo?.id && !!this._predictionInfo.redemptionMessageId) {
             this.fulfillRedemption(PREDICTION_REDEMPTION_REWARD_ID, this._predictionInfo.redemptionMessageId);
         }
@@ -206,6 +212,8 @@ export class ApiManager {
         }
 
         await this.apiClient.predictions.cancelPrediction(this._broadcasterId, activePrediction.id);
+
+        this._socketServer?.emit(SocketEvent.predictionEnded);
 
         if (activePrediction.id === this._predictionInfo?.id && !!this._predictionInfo.redemptionMessageId) {
             this.refundRedemption(PREDICTION_REDEMPTION_REWARD_ID, this._predictionInfo.redemptionMessageId);
@@ -284,12 +292,12 @@ export class ApiManager {
     };
 }
 
-export const createApiManager = async (authProvider: AuthProvider, props?: ApiManagerProps): Promise<ApiManager> => {
+export const createApiManager = async (authProvider: AuthProvider, io?: SocketServer): Promise<ApiManager> => {
     if (!authProvider) {
         throw new Error('Auth provider must be initialized before creating ApiManager');
     }
 
-    const apiManager = new ApiManager(authProvider);
+    const apiManager = new ApiManager(authProvider, io);
 
     console.log(chalk.blue(`🚀 ApiManager initialized!`));
 

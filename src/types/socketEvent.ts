@@ -5,4 +5,6 @@ export enum SocketEvent {
     levelAdded = 'levelAdded',
     queueChanged = 'queueChanged',
     chatMessage = 'chatMessage',
+    predictionStarted = 'predictionStarted',
+    predictionEnded = 'predictionEnded',
 }
