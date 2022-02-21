@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { HttpStatusCode } from '../constants/httpStatusCode';
-import { QUEUE_STATE } from '../services/queue/enums';
+import { HttpStatusCode } from '../../../constants/httpStatusCode';
+import { QUEUE_STATE } from '../../../services/queue/enums';
 
 class QueueController {
     getCurrentQueue = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> =>  {

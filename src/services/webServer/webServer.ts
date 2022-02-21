@@ -9,10 +9,10 @@ import { HttpError } from '../../types/errors';
 import { HttpStatusCode } from '../../constants/httpStatusCode';
 import { Server as SocketServer } from 'socket.io';
 import { TwitchBot } from '../../twitchBot';
-import { chatRoute } from '../../routes/chatRoute';
+import { chatRoute } from './routes/chatRoute';
 import { getServerConfig } from '../../config/config';
-import { predictionRoute } from '../../routes/predictionRoute';
-import { queueRoute } from '../../routes/queueRoute';
+import { predictionRoute } from './routes/predictionRoute';
+import { queueRoute } from './routes/queueRoute';
 
 export class WebServer {
     express: express.Application;

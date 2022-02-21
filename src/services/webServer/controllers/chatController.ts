@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { HttpStatusCode } from '../constants/httpStatusCode';
+import { HttpStatusCode } from '../../../constants/httpStatusCode';
 
 class ChatController {
     sendChatMessage = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {

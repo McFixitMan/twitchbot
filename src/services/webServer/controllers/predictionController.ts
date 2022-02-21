@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { HttpStatusCode } from '../constants/httpStatusCode';
-import { Prediction } from '../services/api/types/prediction';
+import { HttpStatusCode } from '../../../constants/httpStatusCode';
+import { Prediction } from '../../../services/api/types/prediction';
 
 
 class PredictionController {
