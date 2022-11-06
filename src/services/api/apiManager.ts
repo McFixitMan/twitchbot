@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 
-import { ApiClient, HelixPrediction, HelixUser } from '@twurple/api';
+import { ApiClient, HelixChannel, HelixPrediction, HelixUser } from '@twurple/api';
 
 import { AuthProvider } from '@twurple/auth/lib';
 import { PREDICTION_REDEMPTION_REWARD_ID } from '../../constants/redemptions';
@@ -36,6 +36,10 @@ export class ApiManager {
         this._broadcasterId = broadcaster.id;
     };
 
+    getChannelInfo = async (userId?: string): Promise<HelixChannel | undefined> => {
+        return await this.apiClient.channels.getChannelInfoById(userId ?? this._broadcasterId) ?? undefined;
+    };
+    
     updateTitle = async (newTitle: string): Promise<void> => {
         await this.apiClient.channels.updateChannelInfo(this._broadcasterId, {
             title: newTitle,
@@ -44,7 +48,7 @@ export class ApiManager {
 
     getDelaySeconds = async (): Promise<number> => {
         try {
-            const channelInfo = await this.apiClient.channels.getChannelInfo(this._broadcasterId);
+            const channelInfo = await this.getChannelInfo();
             return channelInfo?.delay ?? -1;
         } catch (err) {
             console.log(err);
@@ -54,7 +58,7 @@ export class ApiManager {
     };
 
     getGameInfo = async (): Promise<{ gameName: string; numberOfStreams: number; totalViewers: number } | undefined> => {
-        const channelInfo = await this.apiClient.channels.getChannelInfo(this._broadcasterId);
+        const channelInfo = await this.getChannelInfo();
         if (!channelInfo) {
             return;
         }
@@ -75,7 +79,7 @@ export class ApiManager {
     };
 
     getOtherStreamers = async (): Promise<Array<string>> => {
-        const channelInfo = await this.apiClient.channels.getChannelInfo(this._broadcasterId);
+        const channelInfo = await this.getChannelInfo();
         if (!channelInfo) {
             throw new Error('Couldn\'t get channel info');
         }
@@ -255,7 +259,7 @@ export class ApiManager {
             return undefined;
         }
 
-        const channelInfo = await this.apiClient.channels.getChannelInfo(user.id);
+        const channelInfo = await this.getChannelInfo(user.id);
         
         return channelInfo?.gameName;
     };
