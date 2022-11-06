@@ -40,7 +40,7 @@ class QueueController {
 
             const currentLevel = await queueManager.selectUserLevel(username);
     
-            chatManager.sendMessage(`${currentLevel.username}'s level (${currentLevel.levelCode}) has been selected`);
+            chatManager.sendAnnouncement(`${currentLevel.username}'s level (${currentLevel.levelCode}) has been selected`);
     
             return res
                 .status(HttpStatusCode.OK)
@@ -102,7 +102,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setNextLevel();
 
-            chatManager.sendMessage(`[NEXT] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendAnnouncement(`[NEXT] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
     
             return res
                 .status(HttpStatusCode.OK)
@@ -118,7 +118,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setRandomLevel();
 
-            chatManager.sendMessage(`[RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendAnnouncement(`[RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
     
             return res
                 .status(HttpStatusCode.OK)
@@ -134,7 +134,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setWeightedRandomLevel();
 
-            chatManager.sendMessage(`[W-RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendAnnouncement(`[W-RANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
 
             return res
                 .status(HttpStatusCode.OK)
@@ -150,7 +150,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setSubNextLevel();
 
-            chatManager.sendMessage(`[SUBNEXT] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendAnnouncement(`[SUBNEXT] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
     
             return res
                 .status(HttpStatusCode.OK)
@@ -166,7 +166,7 @@ class QueueController {
         try {
             const nextLevel = await queueManager.setSubNextLevel();
 
-            chatManager.sendMessage(`[SUBRANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
+            chatManager.sendAnnouncement(`[SUBRANDOM] ${nextLevel.username}, your level ${nextLevel.levelCode} is up!`);
     
             return res
                 .status(HttpStatusCode.OK)
@@ -261,7 +261,7 @@ class QueueController {
         try {
             await queueManager.changeCurrentQueueState(QUEUE_STATE.closed);
 
-            await chatManager.sendMessage('The queue is now closed!');
+            await chatManager.sendAnnouncement('The queue is now closed!');
 
             return res
                 .status(HttpStatusCode.OK)
@@ -277,7 +277,7 @@ class QueueController {
         try {
             await queueManager.changeCurrentQueueState(QUEUE_STATE.open);
 
-            await chatManager.sendMessage('The queue is now open!');
+            await chatManager.sendAnnouncement('The queue is now open!');
 
             return res
                 .status(HttpStatusCode.OK)

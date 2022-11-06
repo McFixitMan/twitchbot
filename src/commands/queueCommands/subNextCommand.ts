@@ -22,6 +22,6 @@ export class SubNextCommand extends CommandBase<ChatMessage> {
 
         const nextItem = await queueManager.setSubNextLevel();
 
-        await chatManager.sendMessage(`${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
+        await chatManager.sendAnnouncement(`${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
     };
 }

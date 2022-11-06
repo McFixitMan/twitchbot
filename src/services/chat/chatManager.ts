@@ -83,6 +83,10 @@ export class ChatManager {
         
         console.log(chalk.yellowBright(`[${now.toLocaleTimeString()}] [BOT]: ${message}`));
     };
+    
+    sendAnnouncement = async (message: string): Promise<void> => {
+        await this.chatClient.announce(this._channelName, message);
+    };
 
     timeoutUser = async (username: string, timeoutSeconds?: number, reason?: string): Promise<void> => {
         await this.chatClient.timeout(this._channelName, username, timeoutSeconds, reason);

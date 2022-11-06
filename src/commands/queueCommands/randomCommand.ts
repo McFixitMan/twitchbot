@@ -22,6 +22,6 @@ export class RandomCommand extends CommandBase<ChatMessage> {
 
         const nextItem = await queueManager.setRandomLevel();
 
-        await chatManager.sendMessage(`${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
+        await chatManager.sendAnnouncement(`${nextItem.username}, your level ${nextItem.levelCode} is now up!`);
     };
 }

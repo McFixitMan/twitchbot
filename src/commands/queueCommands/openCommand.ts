@@ -23,6 +23,6 @@ export class OpenCommand extends CommandBase<ChatMessage> {
 
         const queueState = await queueManager.changeCurrentQueueState(QUEUE_STATE.open);
 
-        await chatManager.sendMessage(`The queue is now ${queueState.label.toUpperCase()}!`);
+        await chatManager.sendAnnouncement(`The queue is now ${queueState.label.toUpperCase()}!`);
     };
 }

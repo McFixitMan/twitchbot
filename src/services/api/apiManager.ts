@@ -242,6 +242,40 @@ export class ApiManager {
         await redemption.updateStatus('FULFILLED');
     };
 
+    getUserByUsername = async(username: string): Promise<HelixUser | undefined> => {
+        const user = await this.apiClient.users.getUserByName(username);
+
+        return user ?? undefined;
+    };
+
+    getChannelGameNameByUsername = async(username: string): Promise<string | undefined> => {
+        const user = await this.getUserByUsername(username);
+
+        if (!user) {
+            return undefined;
+        }
+
+        const channelInfo = await this.apiClient.channels.getChannelInfo(user.id);
+        
+        return channelInfo?.gameName;
+    };
+
+    getNumberOfViewers = async (): Promise<number> => {
+        const stream = await this.apiClient.streams.getStreamByUserId(this._broadcasterId);
+                
+        return stream?.viewers ?? 0;
+    };
+
+    createClip = async (): Promise<string | undefined> => {
+        const clipId = await this.apiClient.clips.createClip({
+            channelId: this._broadcasterId,
+        });
+
+        const createdClip = await this.apiClient.clips.getClipById(clipId);
+
+        return createdClip?.embedUrl;
+    };
+
     /**
      * Dont actually use this for any commands dummy, its just a way to create rewards that can be controlled by the bot account
      */
@@ -267,29 +301,6 @@ export class ApiManager {
         console.log(bleh);
     };
 
-    getUserByUsername = async(username: string): Promise<HelixUser | undefined> => {
-        const user = await this.apiClient.users.getUserByName(username);
-
-        return user ?? undefined;
-    };
-
-    getChannelGameNameByUsername = async(username: string): Promise<string | undefined> => {
-        const user = await this.getUserByUsername(username);
-
-        if (!user) {
-            return undefined;
-        }
-
-        const channelInfo = await this.apiClient.channels.getChannelInfo(user.id);
-        
-        return channelInfo?.gameName;
-    };
-
-    getNumberOfViewers = async (): Promise<number> => {
-        const stream = await this.apiClient.streams.getStreamByUserId(this._broadcasterId);
-                
-        return stream?.viewers ?? 0;
-    };
 }
 
 export const createApiManager = async (authProvider: AuthProvider, io?: SocketServer): Promise<ApiManager> => {
