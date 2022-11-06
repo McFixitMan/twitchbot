@@ -335,7 +335,7 @@ export class QueueManager {
         });
     
         if (!progressLevelState) {
-            throw new Error('Couldnt find the right level state... blame McFixit for this travesty');
+            throw new Error(`Couldnt find the right level state...`);
         }
     
         botState.lastCommand = LEVEL_COMMAND.subnext;
@@ -376,7 +376,7 @@ export class QueueManager {
         });
     
         if (!progressLevelState) {
-            throw new Error('Couldnt find the right level state... blame McFixit for this travesty');
+            throw new Error('Couldnt find the right level state...');
         }
     
         botState.lastCommand = LEVEL_COMMAND.random;
@@ -467,7 +467,7 @@ export class QueueManager {
         });
     
         if (!progressLevelState) {
-            throw new Error('Couldnt find the right level state... blame McFixit for this travesty');
+            throw new Error('Couldnt find the right level state...');
         }
     
         botState.lastCommand = LEVEL_COMMAND.subrandom;
@@ -508,7 +508,7 @@ export class QueueManager {
         });
     
         if (!lossState) {
-            throw new Error('Unable to find the loss state... you can blame McFixit for this monstrosity');
+            throw new Error('Unable to find the loss state...');
         }
     
         const currentItem = botState.activeQueueItem;
@@ -540,7 +540,7 @@ export class QueueManager {
         });
     
         if (!winState) {
-            throw new Error('Unable to find the win state... you can blame McFixit for this monstrosity');
+            throw new Error('Unable to find the win state...');
         }
     
         const currentItem = botState.activeQueueItem;
